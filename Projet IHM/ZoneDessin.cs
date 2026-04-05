@@ -14,6 +14,7 @@ namespace Projet_IHM
         private Pen selectedPen = new Pen(System.Drawing.Color.DimGray, 3);
         private bool ctrlPressed = false;
         private bool selectTool = false;
+        private bool justSelected = false;
 
         public ZoneDessin(Modele md) : base()
         {
@@ -119,7 +120,7 @@ namespace Projet_IHM
                 {
                     if (!this.ctrlPressed)
                     {
-                        modele.collide(e.Location);
+                        if (modele.collide(e.Location) != -1) this.justSelected = true;
                         modele.setDeltaMouse(e.Location);
                     } else
                     {
@@ -138,6 +139,8 @@ namespace Projet_IHM
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
+
+            this.justSelected = false;
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -148,7 +151,8 @@ namespace Projet_IHM
             {
                 if (this.selectTool)
                     if (!this.ctrlPressed)
-                        modele.MoveSelected(e.Location);
+                        if (!this.justSelected)
+                            modele.MoveSelected(e.Location);
                 this.Invalidate();
             }
         }

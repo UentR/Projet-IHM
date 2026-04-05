@@ -139,16 +139,17 @@ namespace Projet_IHM
             }
         }
 
-        public void collide(Point p)
+        public int collide(Point p)
         {
             for (int i = 0; i < FormesCount(); i++)
             {
                 if (formes[i].isInside(p))
                 {
                     selectedFormes[i] = formes[i];
-                    return;
+                    return i;
                 }
             }
+            return -1;
         }
 
         public void removeCollide(Point p)
