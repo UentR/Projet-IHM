@@ -12,8 +12,6 @@ namespace Projet_IHM
     internal class DrawVisitor : Projet_IHM.Movable.IVisitor
     {
         private Graphics g;
-        private Brush redBrush = new SolidBrush(Color.Red);
-        private Pen redPen = new Pen(Color.Red, 2);
 
         public DrawVisitor(Graphics graphics)
         {
@@ -23,17 +21,17 @@ namespace Projet_IHM
         public void Visit(Rect rect)
         {
             if (rect.isFull)
-                g.FillRectangle(redBrush, rect.getRect());
+                g.FillRectangle(Brushes.Red, rect.getRect());
             else
-                g.DrawRectangle(redPen, rect.getRect());
+                g.DrawRectangle(Pens.Red, rect.getRect());
         }
 
         public void Visit(Ellipse ellipse)
         {
             if (ellipse.isFull)
-                g.FillEllipse(redBrush, ellipse.getRect());
+                g.FillEllipse(Brushes.Red, ellipse.getRect());
             else
-                g.DrawEllipse(redPen, ellipse.getRect());
+                g.DrawEllipse(Pens.Red, ellipse.getRect());
         }
 
         public void Visit(FreeHand fh)
@@ -58,12 +56,12 @@ namespace Projet_IHM
             
             if (fh.isFull)
             {
-                g.FillPolygon(redBrush, absolutePoints);
+                g.FillPolygon(Brushes.Red, absolutePoints);
             }
             else
             {
                 
-                g.DrawPolygon(redPen, absolutePoints);
+                g.DrawPolygon(Pens.Red, absolutePoints);
             }
         }
     }

@@ -23,7 +23,7 @@ namespace Projet_IHM
 
         private HashSet<Movable.Movable> selectedFormes = new HashSet<Movable.Movable>();
 
-        public int FormesCount() { return formes.Count; }
+        public int FormesCount() => formes.Count;
 
         public void addFH()
         {
@@ -52,7 +52,7 @@ namespace Projet_IHM
 
         public void AddForme(Movable.Movable forme) { formes.Add(forme); OnModelChanged?.Invoke(); }
 
-        public List<Movable.Movable> GetMovables() => formes; 
+        public IReadOnlyList<Movable.Movable> GetMovables() => formes.AsReadOnly();
         public HashSet<Movable.Movable> GetSelected() => selectedFormes;
 
         public void MoveSelected(Point newPos)
@@ -75,7 +75,7 @@ namespace Projet_IHM
 
         public bool collide(Point p)
         {
-            for (int i = 0; i < FormesCount(); i++)
+            for (int i = FormesCount() - 1; i >= 0; i--)
             {
                 if (formes[i].isInside(p))
                 {
