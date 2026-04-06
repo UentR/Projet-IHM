@@ -1,106 +1,194 @@
-﻿using System;
+﻿using Projet_IHM.Movable;
+using Projet_IHM.Movable.Shape;
+using Projet_IHM.Movable.Shape.Simple;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
 namespace Projet_IHM
 {
+
+    internal class DrawVisitor : Projet_IHM.Movable.IVisitor
+    {
+        private Graphics g;
+        private Brush redBrush = new SolidBrush(Color.Red);
+        private Pen redPen = new Pen(Color.Red, 2);
+
+        public DrawVisitor(Graphics graphics)
+        {
+            this.g = graphics;
+        }
+
+        public void Visit(Rect rect)
+        {
+            if (rect.isFull)
+                g.FillRectangle(redBrush, rect.getRect());
+            else
+                g.DrawRectangle(redPen, rect.getRect());
+        }
+
+        public void Visit(Ellipse ellipse)
+        {
+            if (ellipse.isFull)
+                g.FillEllipse(redBrush, ellipse.getRect());
+            else
+                g.DrawEllipse(redPen, ellipse.getRect());
+        }
+
+        public void Visit(FreeHand fh)
+        {
+            List<Point> relPoints = fh.GetPoints();
+            Point basePos = fh.getPosition();
+
+            
+            if (relPoints == null || relPoints.Count < 2)
+                return;
+
+            
+            Point[] absolutePoints = new Point[relPoints.Count];
+            for (int i = 0; i < relPoints.Count; i++)
+            {
+                absolutePoints[i] = new Point(
+                    basePos.X + relPoints[i].X,
+                    basePos.Y + relPoints[i].Y
+                );
+            }
+
+            
+            if (fh.isFull)
+            {
+                g.FillPolygon(redBrush, absolutePoints);
+            }
+            else
+            {
+                
+                g.DrawPolygon(redPen, absolutePoints);
+            }
+        }
+    }
+
+    internal enum Tool
+    {
+        Default,
+        Select,
+        Rect,
+        Ellipse,
+        FreeHand
+    }
+
+
     internal class ZoneDessin : Control
     {
         private Modele modele;
-        private Brush redBrush = new SolidBrush(System.Drawing.Color.Red);
-        private Pen redPen = new Pen(System.Drawing.Color.Red, 2);
         private Brush selectedBrush = new SolidBrush(System.Drawing.Color.DimGray);
         private Pen selectedPen = new Pen(System.Drawing.Color.DimGray, 3);
         private bool ctrlPressed = false;
-        private bool selectTool = false;
         private bool justSelected = false;
+        private Tool currentTool = Tool.Default;
 
         public ZoneDessin(Modele md) : base()
         {
-            this.Location = new System.Drawing.Point(50, 50);
-            this.Size = new System.Drawing.Size(1000, 1000);
+            this.Location = new Point(50, 50);
+            this.Size = new Size(1000, 1000);
             this.modele = md;
+            this.modele.OnModelChanged += () => this.Invalidate();
             this.DoubleBuffered = true;
         }
 
-        //Repeint le widget
-        protected override void OnPaintBackground(PaintEventArgs e)
+
+        private void DrawSelect(PaintEventArgs e)
         {
-            base.OnPaintBackground(e);
-
-            e.Graphics.Clear(System.Drawing.Color.FloralWhite);
-            foreach (Movable forme in modele.GetMovables())
+            foreach (Movable.Movable forme in modele.GetSelected())
             {
-                if (forme is Simple)
-                {
-                    Simple simpleForme = (Simple)forme;
-                    if (simpleForme is Rectangle)
-                    {
-                        if (simpleForme.isFull) e.Graphics.FillRectangle(redBrush, simpleForme.getRect());
-                        else                    e.Graphics.DrawRectangle(redPen, simpleForme.getRect());
-                    }
-                    else if (simpleForme is Ellipse)
-                    {
-                        if (simpleForme.isFull) e.Graphics.FillEllipse(redBrush, simpleForme.getRect());
-                        else                    e.Graphics.DrawEllipse(redPen, simpleForme.getRect());
-                    }
-                }
+                RectangleF rect = forme.getRect();
+                rect.Inflate(4, 4);
+                e.Graphics.DrawRectangle(selectedPen, rect);
+
+                continue;
+
+                // Resize handles
+                int minX = (int)rect.Left;
+                int minY = (int)rect.Top;
+                int maxX = (int)rect.Right;
+                int maxY = (int)rect.Bottom;
+                int diffX = maxX - minX;
+                int diffY = maxY - minY;
+                RectangleF sizeRect = new RectangleF(-4, -4, 8, 8);
+                sizeRect.Offset(minX, minY);
+                e.Graphics.FillRectangle(selectedBrush, sizeRect);
+                sizeRect.Offset(0, diffY);
+                e.Graphics.FillRectangle(selectedBrush, sizeRect);
+                sizeRect.Offset(diffX, -diffY);
+                e.Graphics.FillRectangle(selectedBrush, sizeRect);
+                sizeRect.Offset(0, diffY);
+                e.Graphics.FillRectangle(selectedBrush, sizeRect);
+
+                
+            }
+        }
+    
+
+        //Repeint le widget
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            e.Graphics.Clear(Color.FloralWhite);
+
+            DrawVisitor drawVisitor = new DrawVisitor(e.Graphics);
+
+            foreach (Movable.Movable forme in modele.GetMovables())
+            {
+                forme.Accept(drawVisitor);
             }
 
-            foreach (Movable forme in modele.GetSelected())
+            switch (this.currentTool)
             {
-                if (forme is Simple)
-                {
-                    Simple simpleForme = (Simple)forme;
-                    RectangleF rect = simpleForme.getRect();
-                    rect.Inflate(4, 4);
-                    e.Graphics.DrawRectangle(selectedPen, rect);
-
-                    continue;
-
-                    // Resize handles
-                    int minX = (int)rect.Left;
-                    int minY = (int)rect.Top;
-                    int maxX = (int)rect.Right;
-                    int maxY = (int)rect.Bottom;
-                    int diffX = maxX - minX;
-                    int diffY = maxY - minY;
-                    RectangleF sizeRect = new RectangleF(-4, -4, 8, 8);
-                    sizeRect.Offset(minX, minY);
-                    e.Graphics.FillRectangle(selectedBrush, sizeRect);
-                    sizeRect.Offset(0, diffY);
-                    e.Graphics.FillRectangle(selectedBrush, sizeRect);
-                    sizeRect.Offset(diffX, -diffY);
-                    e.Graphics.FillRectangle(selectedBrush, sizeRect);
-                    sizeRect.Offset(0, diffY);
-                    e.Graphics.FillRectangle(selectedBrush, sizeRect);
-
-                }
+                case Tool.Select:
+                    DrawSelect(e);
+                    break;
+                case Tool.Rect:
+                    break;
+                case Tool.Ellipse:
+                    break;
+                case Tool.FreeHand:
+                    modele.getFH()?.Accept(drawVisitor);
+                    break;
             }
+
+
+            if (this.currentTool == Tool.Select)
+                DrawSelect(e);
 
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
-            if (e.KeyCode == Keys.ControlKey) this.ctrlPressed = true;
-            if (e.KeyCode == Keys.D1)
-            {
-                this.selectTool = true;
-                // change mouse cursor to select
-                Cursor = Cursors.SizeAll;
-            }
-            if (e.KeyCode == Keys.D2)
-            {
-                this.selectTool = false;
-                Cursor = Cursors.Default;
-            }
-            if (e.KeyCode == Keys.Escape)
-            {
-                if (this.selectTool) modele.removeSelected();
 
-                this.Invalidate();
+            switch (e.KeyCode)
+            {
+                case Keys.ControlKey:
+                    this.ctrlPressed = true;
+                    break;
+                case Keys.Escape:
+                    if (this.currentTool == Tool.Select) modele.removeSelected();
+                    break;
+                case Keys.Enter:
+                    if (this.currentTool == Tool.FreeHand) modele.addFH();
+                    break;
+                case Keys.D0:
+                    this.currentTool = Tool.Default;
+                    Cursor = Cursors.Default;
+                    break;
+                case Keys.D1:
+                    this.currentTool = Tool.Select;
+                    Cursor = Cursors.SizeAll;
+                    break;
+                case Keys.D2:
+                    this.currentTool = Tool.FreeHand;
+                    Cursor = Cursors.Hand;
+                    break;
             }
         }
 
@@ -111,29 +199,33 @@ namespace Projet_IHM
         }
 
 
+        private void handleLeftSelect(MouseEventArgs e)
+        {
+            if (!this.ctrlPressed)
+            {
+                this.justSelected = modele.collide(e.Location);
+                modele.setDeltaMouse(e.Location);
+            }
+            else
+            {
+                modele.removeCollide(e.Location);
+            }
+        }
+
+
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            if (e.Button == MouseButtons.Left)
+
+            switch (e.Button, this.currentTool)
             {
-                if (this.selectTool)
-                {
-                    if (!this.ctrlPressed)
-                    {
-                        if (modele.collide(e.Location) != -1) this.justSelected = true;
-                        modele.setDeltaMouse(e.Location);
-                    } else
-                    {
-                        modele.removeCollide(e.Location);
-                    }
-                }
-                
-            }
-            if (e.Button == MouseButtons.Right)
-            {
-                
-            }
-            this.Invalidate();
+                case (MouseButtons.Left, Tool.Select):
+                    handleLeftSelect(e);
+                    break;
+                case (MouseButtons.Left, Tool.FreeHand):
+                    modele.addFHPoint(e.Location);
+                    break;
+            }            
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
@@ -147,13 +239,16 @@ namespace Projet_IHM
         {
             base.OnMouseMove(e);
 
-            if (e.Button == MouseButtons.Left)
+            switch (e.Button, this.currentTool)
             {
-                if (this.selectTool)
+                case (MouseButtons.Left, Tool.Select):
                     if (!this.ctrlPressed)
                         if (!this.justSelected)
                             modele.MoveSelected(e.Location);
-                this.Invalidate();
+                    break;
+                case (MouseButtons.None, Tool.FreeHand):
+                    modele.addMouseFH(e.Location);
+                    break;
             }
         }
     }
