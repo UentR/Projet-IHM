@@ -6,26 +6,26 @@ namespace Projet_IHM.Movable
 {
     internal abstract class Movable
     {
-        protected Point position;
-        protected Size deltaMouse = Size.Empty;
+        protected PointF position;
+        protected SizeF deltaMouse = SizeF.Empty;
         protected bool currentlySelected = false;
 
-        public Movable(Point pos) { this.position = pos; }
+        public Movable(PointF pos) { this.position = pos; }
 
         public abstract void Accept(IVisitor visitor);
 
         protected void setSelected(bool selected) { this.currentlySelected = selected; }
         public bool isSelected() => this.currentlySelected;
 
-        public void setDeltaMouse(Point mousePos)
+        public void setDeltaMouse(PointF mousePos)
         {
-            this.deltaMouse = new Size(mousePos.X - position.X, mousePos.Y - position.Y);
+            this.deltaMouse = new SizeF(mousePos.X - position.X, mousePos.Y - position.Y);
             this.currentlySelected = true;
         }
 
-        public void releaseShape() { this.currentlySelected = false; this.deltaMouse = Size.Empty; }
-        public abstract bool isInside(Point p);
-        public void updatePosition(Point newPos) { this.position = newPos - this.deltaMouse; }
+        public void releaseShape() { this.currentlySelected = false; this.deltaMouse = SizeF.Empty; }
+        public abstract bool isInside(PointF p);
+        public void updatePosition(PointF newPos) { this.position = newPos - this.deltaMouse; }
 
         public abstract RectangleF getRect();
 

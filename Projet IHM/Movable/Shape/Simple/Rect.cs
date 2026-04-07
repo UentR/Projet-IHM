@@ -7,13 +7,13 @@ namespace Projet_IHM.Movable.Shape.Simple
     class Rect : Simple
     {
 
-        public Rect(Point position, Size s) : base(position, s) { }
+        public Rect(PointF position, SizeF s) : base(position, s) { }
 
-        public Rect(Point position, Size s, bool isFull) : base(position, s, isFull) { }
+        public Rect(PointF position, SizeF s, bool isFull) : base(position, s, isFull) { }
 
         public override double Area() => this.size.Height * this.size.Width;
 
-        public override bool isInside(Point p)
+        public override bool isInside(PointF p)
         {
             return (p.X >= position.X && p.X <= position.X + this.size.Width) &&
                    (p.Y >= position.Y && p.Y <= position.Y + this.size.Height);
@@ -27,7 +27,7 @@ namespace Projet_IHM.Movable.Shape.Simple
 
     class Square : Rect
     {
-        public Square(Point position, int side) : base(position, new Size(side, side)) { }
-        public Square(Point position, int side, bool isFull) : base(position, new Size(side, side), isFull) { }
+        public Square(PointF position, float side) : base(position, new SizeF(side, side)) { }
+        public Square(PointF position, float side, bool isFull) : base(position, new SizeF(side, side), isFull) { }
     }
 }

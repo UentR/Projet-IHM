@@ -6,15 +6,15 @@ namespace Projet_IHM.Movable.Shape.Simple
 {
     class Ellipse : Simple
     {
-        public Ellipse(Point position, Size s) : base(position, s) { }
+        public Ellipse(PointF position, SizeF s) : base(position, s) { }
 
-        public Ellipse(Point position, Size s, bool isFull) : base(position, s, isFull) { }
+        public Ellipse(PointF position, SizeF s, bool isFull) : base(position, s, isFull) { }
 
         public override double Area()
         {
             return Math.PI * (this.size.Width / 2.0) * (this.size.Height / 2.0);
         }
-        public override bool isInside(Point p)
+        public override bool isInside(PointF p)
         {
             double centerX = position.X + this.size.Width / 2.0;
             double centerY = position.Y + this.size.Height / 2.0;
@@ -31,7 +31,7 @@ namespace Projet_IHM.Movable.Shape.Simple
 
     class Circle : Ellipse
     {
-        public Circle(Point position, int radius) : base(position, new Size(radius * 2, radius * 2)) { }
-        public Circle(Point position, int radius, bool isFull) : base(position, new Size(radius * 2, radius * 2), isFull) { }
+        public Circle(PointF position, float radius) : base(position, new SizeF(radius * 2, radius * 2)) { }
+        public Circle(PointF position, float radius, bool isFull) : base(position, new SizeF(radius * 2, radius * 2), isFull) { }
     }
 }

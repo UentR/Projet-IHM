@@ -16,9 +16,9 @@ namespace Projet_IHM
 
         private List<Movable.Movable> formes = new List<Movable.Movable>
         {
-            new Rect(new Point(0, 0), new Size(410, 210)),
-            new Ellipse(new Point(500, 500), new Size(350, 505)),
-            new Square(new Point(100, 600), 300, false)
+            new Rect(new PointF(0, 0), new Size(410, 210)),
+            new Ellipse(new PointF(500, 500), new Size(350, 505)),
+            new Square(new PointF(100, 600), 300, false)
         };
 
         private HashSet<Movable.Movable> selectedFormes = new HashSet<Movable.Movable>();
@@ -29,18 +29,18 @@ namespace Projet_IHM
         {
             if (currentFHDraw != null)
             {
-                currentFHDraw.ClearLastPoint();
+                currentFHDraw.ClearLastPointF();
                 formes.Add(currentFHDraw);
                 currentFHDraw = null;
                 OnModelChanged?.Invoke();
             }
         }
 
-        public void addMouseFH(Point p)
+        public void addMouseFH(PointF p)
         {
             if (currentFHDraw != null)
             {
-                currentFHDraw.SetLastPoint(p);
+                currentFHDraw.SetLastPointF(p);
                 OnModelChanged?.Invoke();
             }
         }
@@ -55,7 +55,7 @@ namespace Projet_IHM
         public IReadOnlyList<Movable.Movable> GetMovables() => formes.AsReadOnly();
         public HashSet<Movable.Movable> GetSelected() => selectedFormes;
 
-        public void MoveSelected(Point newPos)
+        public void MoveSelected(PointF newPos)
         {
             foreach (var forme in selectedFormes)
             {
@@ -64,7 +64,7 @@ namespace Projet_IHM
             OnModelChanged?.Invoke();
         }
 
-        public void setDeltaMouse(Point mousePos)
+        public void setDeltaMouse(PointF mousePos)
         {
             foreach (var forme in selectedFormes)
             {
@@ -73,7 +73,7 @@ namespace Projet_IHM
             OnModelChanged?.Invoke();
         }
 
-        public bool collide(Point p)
+        public bool collide(PointF p)
         {
             for (int i = FormesCount() - 1; i >= 0; i--)
             {
@@ -87,7 +87,7 @@ namespace Projet_IHM
             return false;
         }
 
-        public void removeCollide(Point p)
+        public void removeCollide(PointF p)
         {
             foreach (var kvp in selectedFormes)
             {
@@ -101,7 +101,7 @@ namespace Projet_IHM
         }
 
 
-        public void addFHPoint(Point p)
+        public void addFHPointF(PointF p)
         {
             if (currentFHDraw != null)
             {

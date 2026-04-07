@@ -36,24 +36,31 @@ namespace Projet_IHM
 
         public void Visit(FreeHand fh)
         {
-            List<Point> relPoints = fh.GetPoints();
-            Point basePos = fh.getPosition();
+            List<PointF> relPoints = fh.GetPoints();
+            PointF basePos = fh.getPosition();
 
+            Debug.WriteLine(relPoints.Count);
             
             if (relPoints == null || relPoints.Count < 2)
                 return;
 
             
-            Point[] absolutePoints = new Point[relPoints.Count];
+            PointF[] absolutePoints = new PointF[relPoints.Count];
             for (int i = 0; i < relPoints.Count; i++)
             {
-                absolutePoints[i] = new Point(
+                absolutePoints[i] = new PointF(
                     basePos.X + relPoints[i].X,
                     basePos.Y + relPoints[i].Y
                 );
             }
 
             
+            if (absolutePoints.Length == 2)
+            {
+                g.DrawLine(Pens.Red, absolutePoints[0], absolutePoints[1]);
+                return;
+            }
+
             if (fh.isFull)
             {
                 g.FillPolygon(Brushes.Red, absolutePoints);
@@ -221,7 +228,7 @@ namespace Projet_IHM
                     handleLeftSelect(e);
                     break;
                 case (MouseButtons.Left, Tool.FreeHand):
-                    modele.addFHPoint(e.Location);
+                    modele.addFHPointF(e.Location);
                     break;
             }            
         }

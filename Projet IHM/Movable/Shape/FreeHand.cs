@@ -6,62 +6,62 @@ namespace Projet_IHM.Movable.Shape
 {
     class FreeHand : Shape
     {
-        protected List<Point> relativePoints;
-        protected Point lastPoint = Point.Empty;
+        protected List<PointF> relativePoints;
+        protected PointF lastPoint = PointF.Empty;
 
-        public FreeHand(Point pos, List<Point> points) : base(pos) { relativePoints = points; }
-        public FreeHand(Point pos, List<Point> points, bool isFull) : base(pos, isFull) { relativePoints = points; }
-        public FreeHand(Point pos) : base(pos) { relativePoints = new List<Point> { Point.Empty }; }
-        public FreeHand(Point pos, bool isFull) : base(pos, isFull) { relativePoints = new List<Point> { Point.Empty }; }
+        public FreeHand(PointF pos, List<PointF> points) : base(pos) { relativePoints = points; }
+        public FreeHand(PointF pos, List<PointF> points, bool isFull) : base(pos, isFull) { relativePoints = points; }
+        public FreeHand(PointF pos) : base(pos) { relativePoints = new List<PointF> { PointF.Empty }; }
+        public FreeHand(PointF pos, bool isFull) : base(pos, isFull) { relativePoints = new List<PointF> { PointF.Empty }; }
 
         public override double Area() => throw new NotImplementedException();
 
-        public void Add(Point p)
+        public void Add(PointF p)
         {
-            relativePoints.Add(new Point(p.X - position.X, p.Y - position.Y));
+            relativePoints.Add(new PointF(p.X - position.X, p.Y - position.Y));
         }
 
-        public void SetLastPoint(Point p)
+        public void SetLastPointF(PointF p)
         {
-            lastPoint = new Point(p.X - position.X, p.Y - position.Y);
+            lastPoint = new PointF(p.X - position.X, p.Y - position.Y);
         }
 
-        public void ClearLastPoint()
+        public void ClearLastPointF()
         {
-            lastPoint = Point.Empty;
+            lastPoint = PointF.Empty;
         }
 
         public override RectangleF getRect()
         {
-            int minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
+            float minX = float.MaxValue, minY = float.MaxValue, maxX = float.MinValue, maxY = float.MinValue;
 
-            foreach (Point p in relativePoints)
+            foreach (PointF p in relativePoints)
             {
                 if (p.X < minX) minX = p.X;
                 if (p.Y < minY) minY = p.Y;
                 if (p.X > maxX) maxX = p.X;
                 if (p.Y > maxY) maxY = p.Y;
             }
-            Point upLeft = new Point(minX, minY) + (Size)position;
-            Size size = new Size(maxX - minX, maxY - minY);
+            PointF upLeft = new PointF(minX, minY) + (SizeF)position.ToVector2();
+            SizeF size = new SizeF(maxX - minX, maxY - minY);
             return new RectangleF(upLeft, size);
         }
 
-        public List<Point> GetPoints()
+        public List<PointF> GetPoints()
         {
-            if (lastPoint == Point.Empty)  return relativePoints; 
+            if (lastPoint == PointF.Empty)  return relativePoints; 
             else
             {
-                List<Point> points = new List<Point>(relativePoints);
+                List<PointF> points = new List<PointF>(relativePoints);
                 points.Add(lastPoint);
                 return points;
             }
             
         }
 
-        public override bool isInside(Point p)
+        public override bool isInside(PointF p)
         {
-            // Algorithme de ray-casting pour déterminer si le point est à l'intérieur du polygone
+            // Algorithme de ray-casting pour déterminer si le PointF est à l'intérieur du polygone
             if (relativePoints == null || relativePoints.Count < 3)
                 return false;
 

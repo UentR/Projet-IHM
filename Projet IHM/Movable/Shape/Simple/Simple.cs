@@ -7,13 +7,13 @@ namespace Projet_IHM.Movable.Shape.Simple
 {
     abstract class Simple : Shape
     {
-        protected Size size;
-        public Simple(Point position, Size s) : base(position)
+        protected SizeF size;
+        public Simple(PointF position, SizeF s) : base(position)
         {
             this.size = s;
         }
 
-        public Simple(Point position, Size s, bool isFull) : base(position, isFull)
+        public Simple(PointF position, SizeF s, bool isFull) : base(position, isFull)
         {
             this.size = s;
         }
