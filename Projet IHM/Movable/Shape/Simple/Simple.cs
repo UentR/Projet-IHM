@@ -19,5 +19,10 @@ namespace Projet_IHM.Movable.Shape.Simple
         }
 
         public override RectangleF getRect() => new RectangleF(this.position, this.size);
+
+        public virtual void resize(SizeF size)
+        {
+            this.size = size;
+        }
     }
 }

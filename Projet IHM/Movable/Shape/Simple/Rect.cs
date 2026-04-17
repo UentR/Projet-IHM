@@ -8,6 +8,7 @@ namespace Projet_IHM.Movable.Shape.Simple
     {
 
         public Rect(PointF position, SizeF s) : base(position, s) { }
+        public Rect(PointF position) : base(position, SizeF.Empty) { }
 
         public Rect(PointF position, SizeF s, bool isFull) : base(position, s, isFull) { }
 
@@ -19,15 +20,22 @@ namespace Projet_IHM.Movable.Shape.Simple
                    (p.Y >= position.Y && p.Y <= position.Y + this.size.Height);
         }
 
-        public override void Accept(IVisitor visitor)
+        public override void Accept(IVisitor visitor, SizeF ratio)
         {
-            visitor.Visit(this);
+            visitor.Visit(this, ratio);
         }
     }
 
     class Square : Rect
     {
         public Square(PointF position, float side) : base(position, new SizeF(side, side)) { }
+        public Square(PointF position) : base(position) { }
         public Square(PointF position, float side, bool isFull) : base(position, new SizeF(side, side), isFull) { }
+
+        public override void resize(SizeF size)
+        {
+            float side = Math.Max(size.Width, size.Height);
+            this.size = new SizeF(side, side);
+        }
     }
 }

@@ -9,7 +9,7 @@ using System.Text;
 namespace Projet_IHM
 {
 
-    internal class DrawVisitor : Projet_IHM.Movable.IVisitor
+    internal class DrawVisitor : IVisitor
     {
         private Graphics g;
 
@@ -18,23 +18,23 @@ namespace Projet_IHM
             this.g = graphics;
         }
 
-        public void Visit(Rect rect)
+        public void Visit(Rect rect, SizeF ratio)
         {
             if (rect.isFull)
-                g.FillRectangle(Brushes.Red, rect.getRect());
+                g.FillRectangle(Brushes.Red, rect.getRect().multiply(ratio));
             else
-                g.DrawRectangle(Pens.Red, rect.getRect());
+                g.DrawRectangle(Pens.Red, rect.getRect().multiply(ratio));
         }
 
-        public void Visit(Ellipse ellipse)
+        public void Visit(Ellipse ellipse, SizeF ratio)
         {
             if (ellipse.isFull)
-                g.FillEllipse(Brushes.Red, ellipse.getRect());
+                g.FillEllipse(Brushes.Red, ellipse.getRect().multiply(ratio));
             else
-                g.DrawEllipse(Pens.Red, ellipse.getRect());
+                g.DrawEllipse(Pens.Red, ellipse.getRect().multiply(ratio));
         }
 
-        public void Visit(FreeHand fh)
+        public void Visit(FreeHand fh, SizeF ratio)
         {
             List<PointF> relPoints = fh.GetPoints();
             PointF basePos = fh.getPosition();
@@ -88,17 +88,32 @@ namespace Projet_IHM
         private Modele modele;
         private Brush selectedBrush = new SolidBrush(System.Drawing.Color.DimGray);
         private Pen selectedPen = new Pen(System.Drawing.Color.DimGray, 3);
-        private bool ctrlPressed = false;
         private bool justSelected = false;
         private Tool currentTool = Tool.Default;
+        private Dictionary<string, bool> states = new Dictionary<string, bool> { ["ctrl"] = false, ["shift"] = false };
+        private SizeF goalSize = new SizeF(1000, 1000);
+        private SizeF ratio = new SizeF(1, 1);
 
-        public ZoneDessin(Modele md) : base()
+        public ZoneDessin(Modele md, SizeF s) : base()
         {
-            this.Location = new Point(50, 50);
-            this.Size = new Size(1000, 1000);
+            this.Location = new Point(10, 10);
+            this.Size = s.ToSize();
             this.modele = md;
             this.modele.OnModelChanged += () => this.Invalidate();
             this.DoubleBuffered = true;
+        }
+
+
+        public void setTool(Tool tool)
+        {
+            this.currentTool = tool;
+        }
+
+        public void Resize(float width, float height)
+        {
+            this.Size = (new SizeF(width, height)).ToSize();
+            this.ratio = new SizeF(width / goalSize.Width, height / goalSize.Height);
+            this.Invalidate();
         }
 
 
@@ -144,7 +159,7 @@ namespace Projet_IHM
 
             foreach (Movable.Movable forme in modele.GetMovables())
             {
-                forme.Accept(drawVisitor);
+                forme.Accept(drawVisitor, this.ratio);
             }
 
             switch (this.currentTool)
@@ -152,12 +167,11 @@ namespace Projet_IHM
                 case Tool.Select:
                     DrawSelect(e);
                     break;
-                case Tool.Rect:
-                    break;
-                case Tool.Ellipse:
+                case Tool.Rect or Tool.Ellipse:
+                    modele.getSimpleDraw()?.Accept(drawVisitor, this.ratio);
                     break;
                 case Tool.FreeHand:
-                    modele.getFH()?.Accept(drawVisitor);
+                    modele.getFH()?.Accept(drawVisitor, this.ratio);
                     break;
             }
 
@@ -174,7 +188,10 @@ namespace Projet_IHM
             switch (e.KeyCode)
             {
                 case Keys.ControlKey:
-                    this.ctrlPressed = true;
+                    this.states["ctrl"] = true;
+                    break;
+                case Keys.ShiftKey:
+                    this.states["shift"] = true;
                     break;
                 case Keys.Escape:
                     if (this.currentTool == Tool.Select) modele.removeSelected();
@@ -191,6 +208,14 @@ namespace Projet_IHM
                     Cursor = Cursors.SizeAll;
                     break;
                 case Keys.D2:
+                    this.currentTool = Tool.Rect;
+                    Cursor = Cursors.Hand;
+                    break;
+                case Keys.D3:
+                    this.currentTool = Tool.Ellipse;
+                    Cursor = Cursors.Hand;
+                    break;
+                case Keys.D4:
                     this.currentTool = Tool.FreeHand;
                     Cursor = Cursors.Hand;
                     break;
@@ -200,13 +225,21 @@ namespace Projet_IHM
         protected override void OnKeyUp(KeyEventArgs e)
         {
             base.OnKeyUp(e);
-            if (e.KeyCode == Keys.ControlKey) this.ctrlPressed = false;
+            switch (e.KeyCode)
+            {
+                case Keys.ControlKey:
+                    this.states["ctrl"] = false;
+                    break;
+                case Keys.ShiftKey:
+                    this.states["shift"] = false;
+                    break;
+            }
         }
 
 
         private void handleLeftSelect(MouseEventArgs e)
         {
-            if (!this.ctrlPressed)
+            if (!this.states["ctrl"])
             {
                 this.justSelected = modele.collide(e.Location);
                 modele.setDeltaMouse(e.Location);
@@ -230,6 +263,19 @@ namespace Projet_IHM
                 case (MouseButtons.Left, Tool.FreeHand):
                     modele.addFHPointF(e.Location);
                     break;
+                case (MouseButtons.Left, Tool.Rect):
+                    if (this.states["shift"])
+                        modele.setPosNewShape(e.Location, Types.Square);
+                    else
+                        modele.setPosNewShape(e.Location, Types.Rect);
+                    break;
+                case (MouseButtons.Left, Tool.Ellipse):
+                    if (this.states["shift"])
+                        modele.setPosNewShape(e.Location, Types.Circle);
+                    else
+                        modele.setPosNewShape(e.Location, Types.Ellipse);
+                    break;
+
             }            
         }
 
@@ -238,6 +284,16 @@ namespace Projet_IHM
             base.OnMouseUp(e);
 
             this.justSelected = false;
+
+            switch (e.Button, this.currentTool)
+            {
+                case (MouseButtons.Left, Tool.Rect):
+                    modele.addSimple();
+                    break;
+                case (MouseButtons.Left, Tool.Ellipse):
+                    modele.addSimple();
+                    break;
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -247,12 +303,15 @@ namespace Projet_IHM
             switch (e.Button, this.currentTool)
             {
                 case (MouseButtons.Left, Tool.Select):
-                    if (!this.ctrlPressed)
+                    if (!this.states["ctrl"])
                         if (!this.justSelected)
                             modele.MoveSelected(e.Location);
                     break;
                 case (MouseButtons.None, Tool.FreeHand):
                     modele.addMouseFH(e.Location);
+                    break;
+                case (MouseButtons.Left, Tool.Rect or Tool.Ellipse):
+                    modele.setSizeSimple(e.Location);
                     break;
             }
         }

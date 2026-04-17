@@ -7,7 +7,7 @@ namespace Projet_IHM.Movable.Shape.Simple
     class Ellipse : Simple
     {
         public Ellipse(PointF position, SizeF s) : base(position, s) { }
-
+        public Ellipse(PointF position) : base(position, SizeF.Empty) { }
         public Ellipse(PointF position, SizeF s, bool isFull) : base(position, s, isFull) { }
 
         public override double Area()
@@ -23,15 +23,24 @@ namespace Projet_IHM.Movable.Shape.Simple
             return normalizedX * normalizedX + normalizedY * normalizedY <= 1;
         }
 
-        public override void Accept(IVisitor visitor)
+        public override void Accept(IVisitor visitor, SizeF ratio)
         {
-            visitor.Visit(this);
+            visitor.Visit(this, ratio);
         }
     }
 
     class Circle : Ellipse
     {
+
+        public Circle(PointF position) : base(position) { }
+
         public Circle(PointF position, float radius) : base(position, new SizeF(radius * 2, radius * 2)) { }
         public Circle(PointF position, float radius, bool isFull) : base(position, new SizeF(radius * 2, radius * 2), isFull) { }
+
+        public override void resize(SizeF size)
+        {
+            float side = Math.Max(size.Width, size.Height);
+            this.size = new SizeF(side, side);
+        }
     }
 }

@@ -91,9 +91,9 @@ namespace Projet_IHM.Movable.Shape
             return inside;
         }
 
-        public override void Accept(IVisitor visitor)
+        public override void Accept(IVisitor visitor, SizeF ratio)
         {
-            visitor.Visit(this);
+            visitor.Visit(this, ratio);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Projet_IHM.Movable
 
         public Movable(PointF pos) { this.position = pos; }
 
-        public abstract void Accept(IVisitor visitor);
+        public abstract void Accept(IVisitor visitor, SizeF ratio);
 
         protected void setSelected(bool selected) { this.currentlySelected = selected; }
         public bool isSelected() => this.currentlySelected;

@@ -6,13 +6,27 @@ using Projet_IHM.Movable.Shape.Simple;
 
 namespace Projet_IHM
 {
+    enum Types
+    {
+        Rect,
+        Square,
+        Ellipse,
+        Circle,
+    }
+
+
+
+
     internal class Modele
     {
         public event Action OnModelChanged;
 
         private FreeHand currentFHDraw = null;
+        private Simple currentSDraw = null;
+
 
         public FreeHand getFH() => currentFHDraw;
+        public Simple getSimpleDraw() => currentSDraw;
 
         private List<Movable.Movable> formes = new List<Movable.Movable>
         {
@@ -36,6 +50,16 @@ namespace Projet_IHM
             }
         }
 
+        public void addSimple()
+        {
+            if (currentSDraw != null)
+            {
+                formes.Add(currentSDraw);
+                currentSDraw = null;
+                OnModelChanged?.Invoke();
+            }
+        }
+
         public void addMouseFH(PointF p)
         {
             if (currentFHDraw != null)
@@ -44,6 +68,9 @@ namespace Projet_IHM
                 OnModelChanged?.Invoke();
             }
         }
+
+
+
 
         public Movable.Movable GetForme(int index) => formes[index]; 
 
@@ -113,6 +140,59 @@ namespace Projet_IHM
                 currentFHDraw = new FreeHand(p);
                 OnModelChanged?.Invoke();
             }
+        }
+
+        public void setPosNewShape(PointF p, Types t)
+        {
+            if (currentSDraw == null)
+            {
+                switch (t)
+                {
+                    case (Types.Rect):
+                        currentSDraw = new Rect(p);
+                        break;
+                    case (Types.Square):
+                        currentSDraw = new Square(p);
+                        break;
+                    case (Types.Ellipse):
+                        currentSDraw = new Ellipse(p);
+                        break;
+                    case (Types.Circle):
+                        currentSDraw = new Circle(p);
+                        break;
+                }
+            }
+        }
+
+        public void setSizeSimple(PointF p)
+        {
+            if (currentSDraw != null) 
+            { 
+                SizeF s = p.Subtract(currentSDraw.getPosition());
+
+                currentSDraw.resize(s);
+                OnModelChanged?.Invoke();
+            }
+        }
+    }
+
+    public static class PointFExtensions
+    {
+        public static SizeF Subtract(this PointF p1, PointF p2)
+        {
+            return new SizeF(p1.X - p2.X, p1.Y - p2.Y);
+        }
+    }
+
+    public static class RectangleFExtensions
+    {
+        public static RectangleF multiply(this RectangleF rect, SizeF s)
+        {
+            RectangleF newRect = rect;
+            newRect.Width *= s.Width;
+            newRect.Height *= s.Height;
+            newRect.Location = new PointF(rect.X*s.Width, rect.Y*s.Height);
+            return newRect;
         }
     }
 }
