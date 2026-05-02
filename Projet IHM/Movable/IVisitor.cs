@@ -9,8 +9,8 @@ namespace Projet_IHM.Movable
 {
     internal interface IVisitor
     {
-        public void Visit(Rect rect, SizeF ratio);
-        public void Visit(Ellipse ellipse, SizeF ratio);
-        public void Visit(FreeHand fh, SizeF ratio);
+        public void Visit(Rect rect);
+        public void Visit(Ellipse ellipse);
+        public void Visit(FreeHand fh);
     }
 }

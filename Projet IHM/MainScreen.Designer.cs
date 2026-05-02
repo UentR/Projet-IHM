@@ -41,6 +41,9 @@
             TitleBar = new TableLayoutPanel();
             menuStrip1 = new MenuStrip();
             fichierToolStripMenuItem = new ToolStripMenuItem();
+            nouveauToolStripMenuItem = new ToolStripMenuItem();
+            ouvrirToolStripMenuItem = new ToolStripMenuItem();
+            sauvegarderToolStripMenuItem = new ToolStripMenuItem();
             editionToolStripMenuItem = new ToolStripMenuItem();
             affichageToolStripMenuItem = new ToolStripMenuItem();
             optionToolStripMenuItem = new ToolStripMenuItem();
@@ -50,6 +53,8 @@
             button3 = new Button();
             separation = new Panel();
             MainScreenSpliter = new SplitContainer();
+            flowLayoutPanel1 = new FlowLayoutPanel();
+            controleCalque1 = new ControleCalque();
             MainTopBar.SuspendLayout();
             panelArrondi1.SuspendLayout();
             menuStrip2.SuspendLayout();
@@ -57,7 +62,9 @@
             menuStrip1.SuspendLayout();
             ModifyWindowPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)MainScreenSpliter).BeginInit();
+            MainScreenSpliter.Panel1.SuspendLayout();
             MainScreenSpliter.SuspendLayout();
+            flowLayoutPanel1.SuspendLayout();
             SuspendLayout();
             // 
             // MainTopBar
@@ -67,14 +74,14 @@
             MainTopBar.Controls.Add(panelArrondi1, 0, 1);
             MainTopBar.Controls.Add(TitleBar, 0, 0);
             MainTopBar.Dock = DockStyle.Top;
-            MainTopBar.Location = new Point(0, 0);
+            MainTopBar.Location = new Point(5, 5);
+            MainTopBar.Margin = new Padding(0);
             MainTopBar.Name = "MainTopBar";
             MainTopBar.RowCount = 2;
             MainTopBar.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
             MainTopBar.RowStyles.Add(new RowStyle(SizeType.Absolute, 75F));
-            MainTopBar.Size = new Size(1109, 125);
+            MainTopBar.Size = new Size(1099, 125);
             MainTopBar.TabIndex = 0;
-            MainTopBar.Margin = new Padding(0);
             // 
             // panelArrondi1
             // 
@@ -84,7 +91,7 @@
             panelArrondi1.Location = new Point(3, 53);
             panelArrondi1.Name = "panelArrondi1";
             panelArrondi1.Padding = new Padding(15, 5, 15, 5);
-            panelArrondi1.Size = new Size(1103, 69);
+            panelArrondi1.Size = new Size(1093, 69);
             panelArrondi1.TabIndex = 0;
             // 
             // menuStrip2
@@ -94,7 +101,7 @@
             menuStrip2.Items.AddRange(new ToolStripItem[] { selectToolStripMenuItem, zoomToolStripMenuItem, shapeToolStripMenuItem });
             menuStrip2.Location = new Point(15, 5);
             menuStrip2.Name = "menuStrip2";
-            menuStrip2.Size = new Size(1073, 59);
+            menuStrip2.Size = new Size(1063, 59);
             menuStrip2.TabIndex = 1;
             menuStrip2.Text = "menuStrip2";
             // 
@@ -115,14 +122,14 @@
             // 
             shapeToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { simpleShapesToolStripMenuItem, freehandShapeToolStripMenuItem });
             shapeToolStripMenuItem.Name = "shapeToolStripMenuItem";
-            shapeToolStripMenuItem.Size = new Size(85, 54);
+            shapeToolStripMenuItem.Size = new Size(85, 55);
             shapeToolStripMenuItem.Text = "Shapes";
             // 
             // simpleShapesToolStripMenuItem
             // 
             simpleShapesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { rectangleToolStripMenuItem, ellipseToolStripMenuItem });
             simpleShapesToolStripMenuItem.Name = "simpleShapesToolStripMenuItem";
-            simpleShapesToolStripMenuItem.Size = new Size(270, 34);
+            simpleShapesToolStripMenuItem.Size = new Size(241, 34);
             simpleShapesToolStripMenuItem.Text = "Simple Shapes";
             // 
             // rectangleToolStripMenuItem
@@ -142,7 +149,7 @@
             // freehandShapeToolStripMenuItem
             // 
             freehandShapeToolStripMenuItem.Name = "freehandShapeToolStripMenuItem";
-            freehandShapeToolStripMenuItem.Size = new Size(270, 34);
+            freehandShapeToolStripMenuItem.Size = new Size(241, 34);
             freehandShapeToolStripMenuItem.Text = "Freehand Shape";
             freehandShapeToolStripMenuItem.Click += ToolStripMenuItem_Click;
             // 
@@ -156,11 +163,11 @@
             TitleBar.Dock = DockStyle.Fill;
             TitleBar.Location = new Point(0, 0);
             TitleBar.Margin = new Padding(0);
-            TitleBar.Padding = new Padding(0, 0, 0, 5);
             TitleBar.Name = "TitleBar";
+            TitleBar.Padding = new Padding(0, 0, 0, 5);
             TitleBar.RowCount = 1;
             TitleBar.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            TitleBar.Size = new Size(1109, 50);
+            TitleBar.Size = new Size(1099, 50);
             TitleBar.TabIndex = 0;
             TitleBar.MouseDown += panelTitre_MouseDown;
             // 
@@ -171,33 +178,54 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fichierToolStripMenuItem, editionToolStripMenuItem, affichageToolStripMenuItem, optionToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(974, 50);
+            menuStrip1.Size = new Size(949, 45);
             menuStrip1.TabIndex = 3;
             menuStrip1.Text = "menuStrip1";
             menuStrip1.MouseDown += panelTitre_MouseDown;
             // 
             // fichierToolStripMenuItem
             // 
+            fichierToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { nouveauToolStripMenuItem, ouvrirToolStripMenuItem, sauvegarderToolStripMenuItem });
             fichierToolStripMenuItem.Name = "fichierToolStripMenuItem";
-            fichierToolStripMenuItem.Size = new Size(78, 46);
+            fichierToolStripMenuItem.Size = new Size(78, 41);
             fichierToolStripMenuItem.Text = "Fichier";
+            // 
+            // nouveauToolStripMenuItem
+            // 
+            nouveauToolStripMenuItem.Name = "nouveauToolStripMenuItem";
+            nouveauToolStripMenuItem.Size = new Size(270, 34);
+            nouveauToolStripMenuItem.Text = "Nouveau";
+            // 
+            // ouvrirToolStripMenuItem
+            // 
+            ouvrirToolStripMenuItem.Name = "ouvrirToolStripMenuItem";
+            ouvrirToolStripMenuItem.Size = new Size(270, 34);
+            ouvrirToolStripMenuItem.Text = "Ouvrir";
+            ouvrirToolStripMenuItem.Click += ouvrirToolStripMenuItem_Click;
+            // 
+            // sauvegarderToolStripMenuItem
+            // 
+            sauvegarderToolStripMenuItem.Name = "sauvegarderToolStripMenuItem";
+            sauvegarderToolStripMenuItem.Size = new Size(270, 34);
+            sauvegarderToolStripMenuItem.Text = "Sauvegarder";
+            sauvegarderToolStripMenuItem.Click += sauvegarderToolStripMenuItem_Click;
             // 
             // editionToolStripMenuItem
             // 
             editionToolStripMenuItem.Name = "editionToolStripMenuItem";
-            editionToolStripMenuItem.Size = new Size(83, 46);
+            editionToolStripMenuItem.Size = new Size(83, 41);
             editionToolStripMenuItem.Text = "Edition";
             // 
             // affichageToolStripMenuItem
             // 
             affichageToolStripMenuItem.Name = "affichageToolStripMenuItem";
-            affichageToolStripMenuItem.Size = new Size(103, 46);
+            affichageToolStripMenuItem.Size = new Size(103, 41);
             affichageToolStripMenuItem.Text = "Affichage";
             // 
             // optionToolStripMenuItem
             // 
             optionToolStripMenuItem.Name = "optionToolStripMenuItem";
-            optionToolStripMenuItem.Size = new Size(84, 46);
+            optionToolStripMenuItem.Size = new Size(84, 41);
             optionToolStripMenuItem.Text = "Option";
             // 
             // ModifyWindowPanel
@@ -208,10 +236,10 @@
             ModifyWindowPanel.Controls.Add(button2);
             ModifyWindowPanel.Controls.Add(button3);
             ModifyWindowPanel.Dock = DockStyle.Fill;
-            ModifyWindowPanel.Location = new Point(974, 0);
+            ModifyWindowPanel.Location = new Point(949, 0);
             ModifyWindowPanel.Margin = new Padding(0);
             ModifyWindowPanel.Name = "ModifyWindowPanel";
-            ModifyWindowPanel.Size = new Size(150, 50);
+            ModifyWindowPanel.Size = new Size(150, 45);
             ModifyWindowPanel.TabIndex = 2;
             ModifyWindowPanel.WrapContents = false;
             // 
@@ -253,30 +281,60 @@
             // 
             // separation
             // 
-            separation.Height = 5;
             separation.Dock = DockStyle.Top;
+            separation.Location = new Point(5, 130);
+            separation.Name = "separation";
+            separation.Size = new Size(1099, 5);
+            separation.TabIndex = 1;
             // 
             // MainScreenSpliter
             // 
             MainScreenSpliter.Dock = DockStyle.Fill;
-            MainScreenSpliter.Location = new Point(0, 125);
-            MainScreenSpliter.Name = "MainScreenSpliter";
-            MainScreenSpliter.Margin = new Padding(0);
-            MainScreenSpliter.Padding = new Padding(0);
-            MainScreenSpliter.Size = new Size(1109, 949);
-            MainScreenSpliter.SplitterDistance = 300;
-            MainScreenSpliter.TabIndex = 0;
-            MainScreenSpliter.SplitterWidth = 5;
-            MainScreenSpliter.TabStop = false;
+            MainScreenSpliter.FixedPanel = FixedPanel.Panel1;
             MainScreenSpliter.IsSplitterFixed = true;
+            MainScreenSpliter.Location = new Point(5, 135);
+            MainScreenSpliter.Margin = new Padding(0);
+            MainScreenSpliter.Name = "MainScreenSpliter";
+            // 
+            // MainScreenSpliter.Panel1
+            // 
+            MainScreenSpliter.Panel1.Controls.Add(flowLayoutPanel1);
             // 
             // MainScreenSpliter.Panel2
             // 
-            MainScreenSpliter.Panel2.BackColor = Theme.Accentuation;
+            MainScreenSpliter.Panel2.BackColor = Color.FromArgb(0, 122, 204);
+            MainScreenSpliter.Size = new Size(1099, 934);
+            MainScreenSpliter.SplitterDistance = 297;
+            MainScreenSpliter.SplitterWidth = 5;
+            MainScreenSpliter.TabIndex = 0;
+            MainScreenSpliter.TabStop = false;
+            // 
+            // flowLayoutPanel1
+            // 
+            flowLayoutPanel1.AutoScroll = true;
+            flowLayoutPanel1.Controls.Add(controleCalque1);
+            flowLayoutPanel1.Dock = DockStyle.Fill;
+            flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanel1.Location = new Point(0, 0);
+            flowLayoutPanel1.Name = "flowLayoutPanel1";
+            flowLayoutPanel1.Size = new Size(297, 934);
+            flowLayoutPanel1.TabIndex = 0;
+            flowLayoutPanel1.WrapContents = false;
+            // 
+            // controleCalque1
+            // 
+            controleCalque1.BackColor = Color.White;
+            controleCalque1.BorderStyle = BorderStyle.FixedSingle;
+            controleCalque1.Location = new Point(3, 3);
+            controleCalque1.MaximumSize = new Size(290, 215);
+            controleCalque1.MinimumSize = new Size(290, 215);
+            controleCalque1.Name = "controleCalque1";
+            controleCalque1.Padding = new Padding(5);
+            controleCalque1.Size = new Size(290, 215);
+            controleCalque1.TabIndex = 0;
             // 
             // MainScreen
             // 
-            Padding = new Padding(5);
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1109, 1074);
@@ -286,6 +344,7 @@
             FormBorderStyle = FormBorderStyle.None;
             MainMenuStrip = menuStrip1;
             Name = "MainScreen";
+            Padding = new Padding(5);
             Text = "MainScreen";
             MainTopBar.ResumeLayout(false);
             panelArrondi1.ResumeLayout(false);
@@ -297,8 +356,10 @@
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ModifyWindowPanel.ResumeLayout(false);
+            MainScreenSpliter.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)MainScreenSpliter).EndInit();
             MainScreenSpliter.ResumeLayout(false);
+            flowLayoutPanel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -326,5 +387,10 @@
         private ToolStripMenuItem ellipseToolStripMenuItem;
         private ToolStripMenuItem freehandShapeToolStripMenuItem;
         private PanelArrondi panelArrondi1;
+        private FlowLayoutPanel flowLayoutPanel1;
+        private ControleCalque controleCalque1;
+        private ToolStripMenuItem nouveauToolStripMenuItem;
+        private ToolStripMenuItem ouvrirToolStripMenuItem;
+        private ToolStripMenuItem sauvegarderToolStripMenuItem;
     }
 }

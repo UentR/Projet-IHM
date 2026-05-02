@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Projet_IHM.Movable.Shape.Simple
 {
+    [DataContract]
+    [KnownType(typeof(Circle))]
     class Ellipse : Simple
     {
         public Ellipse(PointF position, SizeF s) : base(position, s) { }
@@ -23,12 +27,13 @@ namespace Projet_IHM.Movable.Shape.Simple
             return normalizedX * normalizedX + normalizedY * normalizedY <= 1;
         }
 
-        public override void Accept(IVisitor visitor, SizeF ratio)
+        public override void Accept(IVisitor visitor)
         {
-            visitor.Visit(this, ratio);
+            visitor.Visit(this);
         }
     }
 
+    [DataContract]
     class Circle : Ellipse
     {
 

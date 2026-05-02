@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Projet_IHM.Movable.Shape;
+using Projet_IHM.Movable.Shape.Simple;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Projet_IHM.Movable.Shape;
-using Projet_IHM.Movable.Shape.Simple;
+using System.Xml.Linq;
 
 namespace Projet_IHM
 {
@@ -28,16 +29,38 @@ namespace Projet_IHM
         public FreeHand getFH() => currentFHDraw;
         public Simple getSimpleDraw() => currentSDraw;
 
-        private List<Movable.Movable> formes = new List<Movable.Movable>
-        {
+        public List<List<Movable.Movable>> getCalques() => calques;
+
+        private List<List<Movable.Movable>> calques = new List<List<Movable.Movable>> { new List<Movable.Movable> { 
             new Rect(new PointF(0, 0), new Size(410, 210)),
-            new Ellipse(new PointF(500, 500), new Size(350, 505)),
-            new Square(new PointF(100, 600), 300, false)
+            new Ellipse(new PointF(200, 400), new Size(350, 505)),
+            new Square(new PointF(100, 400), 300, false)}
         };
 
+        public void setCalques(List<List<Movable.Movable>> data)
+        {
+            calques = data;
+            OnModelChanged?.Invoke();
+        }
+
+
+        private List<bool> isVisible = new List<bool> { true };
+        private List<bool> isLocked = new List<bool> { false };
+
+        private int currentCalque = 0;
+        private List<Movable.Movable> formes => calques[currentCalque];
         private HashSet<Movable.Movable> selectedFormes = new HashSet<Movable.Movable>();
 
-        public int FormesCount() => formes.Count;
+        public int FormesCount()
+        {
+            int total = 0;
+            foreach (var calque in calques)
+            {
+                total += calque.Count;
+            }
+            return total;
+        }
+        public int FormesCount(int a) => calques[a].Count;
 
         public void addFH()
         {
@@ -79,7 +102,14 @@ namespace Projet_IHM
 
         public void AddForme(Movable.Movable forme) { formes.Add(forme); OnModelChanged?.Invoke(); }
 
-        public IReadOnlyList<Movable.Movable> GetMovables() => formes.AsReadOnly();
+        public IReadOnlyList<Movable.Movable> GetMovables()
+        {
+            List<Movable.Movable> resultat = calques
+            .Where((sousListe, index) => isVisible[index])
+            .SelectMany(sousListe => sousListe)
+            .ToList();
+            return resultat;
+        } 
         public HashSet<Movable.Movable> GetSelected() => selectedFormes;
 
         public void MoveSelected(PointF newPos)
@@ -102,7 +132,7 @@ namespace Projet_IHM
 
         public bool collide(PointF p)
         {
-            for (int i = FormesCount() - 1; i >= 0; i--)
+            for (int i = FormesCount(currentCalque) - 1; i >= 0; i--)
             {
                 if (formes[i].isInside(p))
                 {

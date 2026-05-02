@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Projet_IHM.Movable.Shape
 {
+    [DataContract]
     class FreeHand : Shape
     {
+        [DataMember]
         protected List<PointF> relativePoints;
         protected PointF lastPoint = PointF.Empty;
 
@@ -91,9 +94,9 @@ namespace Projet_IHM.Movable.Shape
             return inside;
         }
 
-        public override void Accept(IVisitor visitor, SizeF ratio)
+        public override void Accept(IVisitor visitor)
         {
-            visitor.Visit(this, ratio);
+            visitor.Visit(this);
         }
     }
 }

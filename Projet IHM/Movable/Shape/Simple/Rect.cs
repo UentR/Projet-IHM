@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Projet_IHM.Movable.Shape.Simple
 {
+    [DataContract]
+    [KnownType(typeof(Square))]
     class Rect : Simple
     {
 
@@ -20,12 +24,13 @@ namespace Projet_IHM.Movable.Shape.Simple
                    (p.Y >= position.Y && p.Y <= position.Y + this.size.Height);
         }
 
-        public override void Accept(IVisitor visitor, SizeF ratio)
+        public override void Accept(IVisitor visitor)
         {
-            visitor.Visit(this, ratio);
+            visitor.Visit(this);
         }
     }
 
+    [DataContract]
     class Square : Rect
     {
         public Square(PointF position, float side) : base(position, new SizeF(side, side)) { }

@@ -1,5 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Projet_IHM
 {
@@ -24,8 +27,7 @@ namespace Projet_IHM
 
             // 1. Initialisation de ton modèle et de ta zone de dessin
             this.md = new Modele();
-            this.zD = new ZoneDessin(this.md, new SizeF(this.MainScreenSpliter.Panel2.Width, this.MainScreenSpliter.Panel2.Height));
-            this.MainScreenSpliter.Panel2.Controls.Add(this.zD);
+
 
             Theme.Appliquer(this);
             TitleBar.BackColor = Theme.FondSecondaire;
@@ -38,10 +40,13 @@ namespace Projet_IHM
 
             this.ResizeRedraw = true;
             this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
+
+            this.zD = new ZoneDessin(this.md, new SizeF(this.MainScreenSpliter.Panel2.Width - 20, this.MainScreenSpliter.Panel2.Height - 20));
+            this.MainScreenSpliter.Panel2.Controls.Add(this.zD);
         }
 
 
-       // Bouton Fermer
+        // Bouton Fermer
         private void btnFermer_Click(object sender, EventArgs e)
         {
             this.Close(); // ou Application.Exit();
@@ -99,8 +104,74 @@ namespace Projet_IHM
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            if (this.zD != null)
-                this.zD.Resize(this.MainScreenSpliter.Panel2.Width, this.MainScreenSpliter.Panel2.Height);
+            //if (this.zD != null)
+            //this.zD.Resize(this.MainScreenSpliter.Panel2.Width, this.MainScreenSpliter.Panel2.Height);
+        }
+
+        private void sauvegarderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Fichiers XML (*.xml)|*.xml";
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string chemin = saveFileDialog.FileName;
+                saveFile(chemin);
+            }
+
+        }
+
+        private void saveFile(string chemin)
+        {
+            var serializer = new DataContractSerializer(typeof(List<List<Movable.Movable>>));
+
+            // Configuration pour avoir un XML "propre" (indenté)
+            var settings = new XmlWriterSettings { Indent = true };
+
+            using (var writer = XmlWriter.Create(chemin, settings))
+            {
+                serializer.WriteObject(writer, this.md.getCalques());
+            }
+        }
+
+        private void ouvrirToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "Fichiers XML (*.xml)|*.xml";
+            openFileDialog.Title = "Ouvrir un projet";
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string chemin = openFileDialog.FileName;
+                loadFile(chemin);
+            }
+        }
+
+        private void loadFile(string chemin)
+        {
+            try
+            {
+                var serializer = new DataContractSerializer(typeof(List<List<Movable.Movable>>));
+
+                using (var fs = new FileStream(chemin, FileMode.Open))
+                {
+                    // On récupère les données et on cast dans le bon type
+                    var data = (List<List<Movable.Movable>>)serializer.ReadObject(fs);
+
+                    // Mise à jour de votre modèle de données
+                    // Supposons que vous ayez une méthode setCalques ou similaire
+                    this.md.setCalques(data);
+
+                    // IMPORTANT : Pensez à forcer le rafraîchissement de l'affichage
+                    this.Refresh();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement : {ex.Message}",
+                                "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 

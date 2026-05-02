@@ -18,23 +18,23 @@ namespace Projet_IHM
             this.g = graphics;
         }
 
-        public void Visit(Rect rect, SizeF ratio)
+        public void Visit(Rect rect)
         {
             if (rect.isFull)
-                g.FillRectangle(Brushes.Red, rect.getRect().multiply(ratio));
+                g.FillRectangle(Brushes.Red, rect.getRect());
             else
-                g.DrawRectangle(Pens.Red, rect.getRect().multiply(ratio));
+                g.DrawRectangle(Pens.Red, rect.getRect());
         }
 
-        public void Visit(Ellipse ellipse, SizeF ratio)
+        public void Visit(Ellipse ellipse)
         {
             if (ellipse.isFull)
-                g.FillEllipse(Brushes.Red, ellipse.getRect().multiply(ratio));
+                g.FillEllipse(Brushes.Red, ellipse.getRect());
             else
-                g.DrawEllipse(Pens.Red, ellipse.getRect().multiply(ratio));
+                g.DrawEllipse(Pens.Red, ellipse.getRect());
         }
 
-        public void Visit(FreeHand fh, SizeF ratio)
+        public void Visit(FreeHand fh)
         {
             List<PointF> relPoints = fh.GetPoints();
             PointF basePos = fh.getPosition();
@@ -91,8 +91,7 @@ namespace Projet_IHM
         private bool justSelected = false;
         private Tool currentTool = Tool.Default;
         private Dictionary<string, bool> states = new Dictionary<string, bool> { ["ctrl"] = false, ["shift"] = false };
-        private SizeF goalSize = new SizeF(1000, 1000);
-        private SizeF ratio = new SizeF(1, 1);
+        
 
         public ZoneDessin(Modele md, SizeF s) : base()
         {
@@ -107,13 +106,6 @@ namespace Projet_IHM
         public void setTool(Tool tool)
         {
             this.currentTool = tool;
-        }
-
-        public void Resize(float width, float height)
-        {
-            this.Size = (new SizeF(width, height)).ToSize();
-            this.ratio = new SizeF(width / goalSize.Width, height / goalSize.Height);
-            this.Invalidate();
         }
 
 
@@ -159,7 +151,7 @@ namespace Projet_IHM
 
             foreach (Movable.Movable forme in modele.GetMovables())
             {
-                forme.Accept(drawVisitor, this.ratio);
+                forme.Accept(drawVisitor);
             }
 
             switch (this.currentTool)
@@ -168,10 +160,10 @@ namespace Projet_IHM
                     DrawSelect(e);
                     break;
                 case Tool.Rect or Tool.Ellipse:
-                    modele.getSimpleDraw()?.Accept(drawVisitor, this.ratio);
+                    modele.getSimpleDraw()?.Accept(drawVisitor);
                     break;
                 case Tool.FreeHand:
-                    modele.getFH()?.Accept(drawVisitor, this.ratio);
+                    modele.getFH()?.Accept(drawVisitor);
                     break;
             }
 

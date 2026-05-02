@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 
 namespace Projet_IHM.Movable.Shape.Simple
 {
+    [DataContract]
+    [KnownType(typeof(Rect))]
+    [KnownType(typeof(Ellipse))]
     abstract class Simple : Shape
     {
+        [DataMember]
         protected SizeF size;
         public Simple(PointF position, SizeF s) : base(position)
         {
