@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace Projet_IHM
@@ -27,7 +28,43 @@ namespace Projet_IHM
 
             // 1. Initialisation de ton modèle et de ta zone de dessin
             this.md = new Modele();
+            this.md.UpdateCalque += (state, obj) =>
+            {
+                flowLayoutPanel1.SuspendLayout();
+                if (state)
+                {
+                    flowLayoutPanel1.Controls.Add(obj);
+                    flowLayoutPanel1.Controls.SetChildIndex(obj, 0);
+                }
+                else
+                {
+                    Control? c = flowLayoutPanel1.Controls[obj.Name];
+                    if (c != null)
+                    {
+                        flowLayoutPanel1.Controls.Remove(obj);
+                        c.Dispose();
+                    }
+                }
+                flowLayoutPanel1.ResumeLayout();
+            };
+            this.md.SwapCalque += (first, second) =>
+            {
+                Control? control1 = flowLayoutPanel1.Controls[first.ToString()];
+                Control? control2 = flowLayoutPanel1.Controls[second.ToString()];
+                if (control1 != null && control2 != null)
+                {
+                    flowLayoutPanel1.SuspendLayout();
 
+                    int index1 = flowLayoutPanel1.Controls.GetChildIndex(control1);
+                    int index2 = flowLayoutPanel1.Controls.GetChildIndex(control2);
+
+                    flowLayoutPanel1.Controls.SetChildIndex(control1, index2);
+                    flowLayoutPanel1.Controls.SetChildIndex(control2, index1);
+
+                    flowLayoutPanel1.ResumeLayout();
+                }
+
+            };
 
             Theme.Appliquer(this);
             TitleBar.BackColor = Theme.FondSecondaire;
@@ -41,6 +78,7 @@ namespace Projet_IHM
             this.ResizeRedraw = true;
             this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
 
+            this.md.CreateNewCalque();
             this.zD = new ZoneDessin(this.md, new SizeF(this.MainScreenSpliter.Panel2.Width - 20, this.MainScreenSpliter.Panel2.Height - 20));
             this.MainScreenSpliter.Panel2.Controls.Add(this.zD);
         }
@@ -82,7 +120,6 @@ namespace Projet_IHM
 
         private void ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Debug.WriteLine(((ToolStripMenuItem)sender).Name);
             switch (((ToolStripMenuItem)sender).Name)
             {
                 case "selectToolStripMenuItem":
@@ -124,14 +161,19 @@ namespace Projet_IHM
 
         private void saveFile(string chemin)
         {
-            var serializer = new DataContractSerializer(typeof(List<List<Movable.Movable>>));
+            var serializer = new DataContractSerializer(typeof(SaveDataWrapper));
 
             // Configuration pour avoir un XML "propre" (indenté)
             var settings = new XmlWriterSettings { Indent = true };
+            var dataToSave = new SaveDataWrapper
+            {
+                Calques = this.md.getCalques(),
+                CalquesOrder = this.md.getCalquesOrder()
+            };
 
             using (var writer = XmlWriter.Create(chemin, settings))
             {
-                serializer.WriteObject(writer, this.md.getCalques());
+                serializer.WriteObject(writer, dataToSave);
             }
         }
 
@@ -152,16 +194,16 @@ namespace Projet_IHM
         {
             try
             {
-                var serializer = new DataContractSerializer(typeof(List<List<Movable.Movable>>));
+                var serializer = new DataContractSerializer(typeof(SaveDataWrapper));
 
                 using (var fs = new FileStream(chemin, FileMode.Open))
                 {
                     // On récupère les données et on cast dans le bon type
-                    var data = (List<List<Movable.Movable>>)serializer.ReadObject(fs);
+                    var data = (SaveDataWrapper)serializer.ReadObject(fs);
 
                     // Mise à jour de votre modèle de données
                     // Supposons que vous ayez une méthode setCalques ou similaire
-                    this.md.setCalques(data);
+                    this.md.setCalques(data.Calques, data.CalquesOrder);
 
                     // IMPORTANT : Pensez à forcer le rafraîchissement de l'affichage
                     this.Refresh();
@@ -172,6 +214,16 @@ namespace Projet_IHM
                 MessageBox.Show($"Erreur lors du chargement : {ex.Message}",
                                 "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void Button4_Click(object sender, EventArgs e)
+        {
+            this.md.CreateNewCalque();
+        }
+
+        private void Button5_Click(object sender, EventArgs e)
+        {
+            this.md.deleteCalque();
         }
     }
 
@@ -227,5 +279,15 @@ namespace Projet_IHM
         public override Color ImageMarginGradientBegin => fondPilule;
         public override Color ImageMarginGradientMiddle => fondPilule;
         public override Color ImageMarginGradientEnd => fondPilule;
+    }
+
+    [DataContract(Name = "SaveData")]
+    internal class SaveDataWrapper
+    {
+        [DataMember(Name = "Calques")]
+        required public Dictionary<int, List<Movable.Movable>> Calques { get; set; }
+
+        [DataMember(Name = "MyIntList")]
+        required public List<int> CalquesOrder { get; set; }
     }
 }

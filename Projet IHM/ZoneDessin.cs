@@ -38,8 +38,6 @@ namespace Projet_IHM
         {
             List<PointF> relPoints = fh.GetPoints();
             PointF basePos = fh.getPosition();
-
-            Debug.WriteLine(relPoints.Count);
             
             if (relPoints == null || relPoints.Count < 2)
                 return;

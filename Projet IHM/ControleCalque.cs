@@ -2,26 +2,43 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Projet_IHM
 {
+
+    public enum UpdateCalqueOption
+    {
+        Visibility,
+        Lock,
+        Up,
+        Down,
+        Choose
+    }
+
+
     public class ControleCalque : UserControl
     {
+
+        public Action<int, UpdateCalqueOption> updateCalque = null!;
+
         // 1. Déclaration des composants
-        private Label lblOeil;
-        private Label lblCadenas;
-        private Panel pnlConteneur; // Le "petit conteneur" miniature
-        private Label lblTitre;     // Le nom du calque
-        private TextBox txtEditionTitre;
-        private Button btnHaut;
-        private Button btnBas;
+        private Label lblOeil = null!;
+        private Label lblCadenas = null!;
+        private Panel pnlConteneur = null!; // Le "petit conteneur" miniature
+        private Label lblTitre = null!;     // Le nom du calque
+        private TextBox txtEditionTitre = null!;
+        private Button btnHaut = null!;
+        private Button btnBas = null!;
+        private int id;
 
         // 2. Variables d'état
         private bool estVisible = true;
         private bool estVerrouille = false;
 
-        public ControleCalque()
-        {
+        public ControleCalque(int id) 
+        { 
+            this.id = id;
             InitialiserComposants();
             MettreAJourAffichage();
         }
@@ -34,17 +51,19 @@ namespace Projet_IHM
             this.MaximumSize = new Size(290, 215);
             this.BackColor = Color.FromArgb(45, 45, 48); // Thème sombre
             this.BorderStyle = BorderStyle.FixedSingle;
+            this.Name = id.ToString();
 
             // --- PARTIE HAUTE (Le conteneur et les flèches) ---
 
             // 1. Le Conteneur (Il prend maintenant presque toute la hauteur)
             pnlConteneur = new Panel()
             {
-                Size = new Size(230, 145), // Plus grand pour remplir le nouvel espace
+                Size = new Size(230, 150), // Plus grand pour remplir le nouvel espace
                 Location = new Point(10, 10),
                 BackColor = Color.FromArgb(60, 60, 60),
                 BorderStyle = BorderStyle.FixedSingle
             };
+            this.Click += (sender, e) => { updateCalque?.Invoke(id, UpdateCalqueOption.Choose); };
 
             // Flèche Haut (En haut à droite du conteneur)
             btnHaut = new Button()
@@ -57,7 +76,7 @@ namespace Projet_IHM
                 BackColor = Color.FromArgb(55, 55, 55),
                 Cursor = Cursors.Hand
             };
-            btnHaut.FlatAppearance.BorderSize = 0;
+            btnHaut.Click += (s, e) => { updateCalque?.Invoke(id, UpdateCalqueOption.Up); };
 
             // Flèche Bas (En bas à droite du conteneur, alignée sur son bord inférieur)
             btnBas = new Button()
@@ -70,14 +89,14 @@ namespace Projet_IHM
                 BackColor = Color.FromArgb(55, 55, 55),
                 Cursor = Cursors.Hand
             };
-            btnBas.FlatAppearance.BorderSize = 0;
+            btnBas.Click += (s, e) => { updateCalque?.Invoke(id, UpdateCalqueOption.Down); };
 
             // --- PARTIE BASSE (Label, oeil et cadenas) ---
 
             // 2. Le Label (En dessous de la zone du conteneur)
             lblTitre = new Label()
             {
-                Text = "Calque 2",
+                Text = "Calque " + (id+1).ToString(),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.White,
                 AutoSize = true,
@@ -116,7 +135,7 @@ namespace Projet_IHM
                 Location = new Point(190, 165),
                 Cursor = Cursors.Hand
             };
-            lblOeil.Click += (s, e) => { estVisible = !estVisible; MettreAJourAffichage(); };
+            lblOeil.Click += (s, e) => { estVisible = !estVisible; MettreAJourAffichage(); updateCalque?.Invoke(id, UpdateCalqueOption.Visibility);  };
 
             lblCadenas = new Label()
             {
@@ -125,7 +144,7 @@ namespace Projet_IHM
                 Location = new Point(235, 162),
                 Cursor = Cursors.Hand
             };
-            lblCadenas.Click += (s, e) => { estVerrouille = !estVerrouille; MettreAJourAffichage(); };
+            lblCadenas.Click += (s, e) => { estVerrouille = !estVerrouille; MettreAJourAffichage(); updateCalque?.Invoke(id, UpdateCalqueOption.Lock); };
 
             // Ajout des contrôles
             this.Controls.Add(pnlConteneur);
@@ -203,6 +222,18 @@ namespace Projet_IHM
             else if (e.KeyCode == Keys.Escape)
             {
                 TerminerEditionTitre(true); // Annule les modifications
+            }
+        }
+
+
+        public void SetSelected(bool state)
+        {
+            if (state)
+            {
+                this.BackColor = Color.FromArgb(150, 137, 123);
+            } else
+            {
+                this.BackColor = Color.FromArgb(55, 55, 55);
             }
         }
     }

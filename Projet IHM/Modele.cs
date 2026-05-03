@@ -1,7 +1,9 @@
-﻿using Projet_IHM.Movable.Shape;
+﻿using Projet_IHM.Movable;
+using Projet_IHM.Movable.Shape;
 using Projet_IHM.Movable.Shape.Simple;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Xml.Linq;
 
@@ -15,46 +17,139 @@ namespace Projet_IHM
         Circle,
     }
 
-
-
-
     internal class Modele
     {
-        public event Action OnModelChanged;
+        public Action OnModelChanged = null!;
+        public Action<bool, ControleCalque> UpdateCalque = null!;
+        public Action<int, int> SwapCalque = null!;
 
         private FreeHand currentFHDraw = null;
         private Simple currentSDraw = null;
 
+        private Dictionary<int, ControleCalque> calquesControler = new Dictionary<int, ControleCalque>();
+        private Dictionary<int, List<Movable.Movable>> calques = new Dictionary<int, List<Movable.Movable>>();
+        private List<int> calquesOrder = new List<int>();
+
+        private Dictionary<int, bool> isVisible = new Dictionary<int, bool>();
+        private Dictionary<int, bool> isLocked = new Dictionary<int, bool>();
+
+        private int currentCalque = 0;
+        private int nbCalque = 0;
+        private List<Movable.Movable> formes => calques[currentCalque];
+        private HashSet<Movable.Movable> selectedFormes = new HashSet<Movable.Movable>();
+
+        public void CreateNewCalque()
+        {
+            ControleCalque c = new ControleCalque(nbCalque);
+            calquesControler.Add(nbCalque, c);
+            setupNewCalque(c, nbCalque);
+            while (calquesControler.ContainsKey(nbCalque)) { nbCalque++; }
+        }
+
+        public void CreateNewCalque(int id)
+        {
+            ControleCalque c = new ControleCalque(id);
+            calquesControler.Add(id, c);
+            setupNewCalque(c, id);
+        }
+
+        public void deleteCalque()
+        {
+            if (calquesControler.ContainsKey(currentCalque))
+            {
+                UpdateCalque?.Invoke(false, calquesControler[currentCalque]);
+                calquesControler.Remove(currentCalque);
+            }
+        }
+
+        private void setupNewCalque(ControleCalque c, int id)
+        {
+            calques.Add(id, new List<Movable.Movable>());
+            isVisible.Add(id, true);
+            isLocked.Add(id, false);
+            calquesOrder.Add(id);
+            if (calquesControler.ContainsKey(currentCalque))
+                calquesControler[currentCalque].SetSelected(false);
+            currentCalque = id;
+            c.SetSelected(true);
+            UpdateCalque?.Invoke(true, c);
+            c.updateCalque += (id, type) => {
+                int pos;
+                switch (type)
+                {
+                    case UpdateCalqueOption.Visibility:
+                        isVisible[id] = !isVisible[id]; OnModelChanged?.Invoke();  break;
+                    case UpdateCalqueOption.Lock:
+                        isLocked[id] = !isLocked[id]; break;
+                    case UpdateCalqueOption.Down:
+                        pos = calquesOrder.IndexOf(id);
+                        if (pos > 0)
+                        {
+                            SwapCalque?.Invoke(pos, pos - 1);
+                            int temp = calquesOrder[pos - 1];
+                            calquesOrder[pos - 1] = calquesOrder[pos];
+                            calquesOrder[pos] = temp;
+                        }
+                        break;
+                    case UpdateCalqueOption.Up:
+                        pos = calquesOrder.IndexOf(id);
+                        if (pos < calquesOrder.Count - 1)
+                        {
+                            SwapCalque?.Invoke(pos, pos + 1);
+                            int temp = calquesOrder[pos + 1];
+                            calquesOrder[pos + 1] = calquesOrder[pos];
+                            calquesOrder[pos] = temp;
+                        }
+                        break;
+                    case UpdateCalqueOption.Choose:
+                        if (calquesControler.ContainsKey(currentCalque)) 
+                            calquesControler[currentCalque].SetSelected(false);
+                        currentCalque = id;
+                        calquesControler[currentCalque].SetSelected(true);
+                        break;
+                }
+            };
+        }
 
         public FreeHand getFH() => currentFHDraw;
         public Simple getSimpleDraw() => currentSDraw;
 
-        public List<List<Movable.Movable>> getCalques() => calques;
+        public Dictionary<int, List<Movable.Movable>> getCalques() => calques;
+        public List<int> getCalquesOrder() => calquesOrder;
+        
 
-        private List<List<Movable.Movable>> calques = new List<List<Movable.Movable>> { new List<Movable.Movable> { 
-            new Rect(new PointF(0, 0), new Size(410, 210)),
-            new Ellipse(new PointF(200, 400), new Size(350, 505)),
-            new Square(new PointF(100, 400), 300, false)}
-        };
-
-        public void setCalques(List<List<Movable.Movable>> data)
+        public void setCalques(Dictionary<int, List<Movable.Movable>> data, List<int> dataOrder)
         {
-            calques = data;
+            calques.Clear();
+            isVisible.Clear();
+            isLocked.Clear();
             OnModelChanged?.Invoke();
+            setupCalqueOrder(dataOrder);
+            calquesOrder = dataOrder;
+            calques = data;
         }
 
 
-        private List<bool> isVisible = new List<bool> { true };
-        private List<bool> isLocked = new List<bool> { false };
+        private void setupCalqueOrder(List<int> order)
+        {
 
-        private int currentCalque = 0;
-        private List<Movable.Movable> formes => calques[currentCalque];
-        private HashSet<Movable.Movable> selectedFormes = new HashSet<Movable.Movable>();
+            foreach (var id in calquesOrder)
+            {
+                UpdateCalque?.Invoke(false, calquesControler[id]);
+            }
+            calquesControler.Clear();
+
+            foreach (var id in order)
+            {
+                CreateNewCalque(id);
+            }
+
+        }
 
         public int FormesCount()
         {
             int total = 0;
-            foreach (var calque in calques)
+            foreach (var (id, calque) in calques)
             {
                 total += calque.Count;
             }
@@ -105,9 +200,9 @@ namespace Projet_IHM
         public IReadOnlyList<Movable.Movable> GetMovables()
         {
             List<Movable.Movable> resultat = calques
-            .Where((sousListe, index) => isVisible[index])
-            .SelectMany(sousListe => sousListe)
-            .ToList();
+                .Where(kvp => isVisible.TryGetValue(kvp.Key, out bool estActif) && estActif)
+                .SelectMany(kvp => kvp.Value)
+                .ToList();
             return resultat;
         } 
         public HashSet<Movable.Movable> GetSelected() => selectedFormes;

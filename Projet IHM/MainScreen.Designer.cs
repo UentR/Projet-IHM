@@ -54,7 +54,9 @@
             separation = new Panel();
             MainScreenSpliter = new SplitContainer();
             flowLayoutPanel1 = new FlowLayoutPanel();
-            controleCalque1 = new ControleCalque();
+            controlCalqueButtonsLayout = new FlowLayoutPanel();
+            button4 = new Button();
+            button5 = new Button();
             MainTopBar.SuspendLayout();
             panelArrondi1.SuspendLayout();
             menuStrip2.SuspendLayout();
@@ -64,7 +66,7 @@
             ((System.ComponentModel.ISupportInitialize)MainScreenSpliter).BeginInit();
             MainScreenSpliter.Panel1.SuspendLayout();
             MainScreenSpliter.SuspendLayout();
-            flowLayoutPanel1.SuspendLayout();
+            controlCalqueButtonsLayout.SuspendLayout();
             SuspendLayout();
             // 
             // MainTopBar
@@ -80,7 +82,7 @@
             MainTopBar.RowCount = 2;
             MainTopBar.RowStyles.Add(new RowStyle(SizeType.Absolute, 50F));
             MainTopBar.RowStyles.Add(new RowStyle(SizeType.Absolute, 75F));
-            MainTopBar.Size = new Size(1099, 125);
+            MainTopBar.Size = new Size(1672, 125);
             MainTopBar.TabIndex = 0;
             // 
             // panelArrondi1
@@ -91,7 +93,7 @@
             panelArrondi1.Location = new Point(3, 53);
             panelArrondi1.Name = "panelArrondi1";
             panelArrondi1.Padding = new Padding(15, 5, 15, 5);
-            panelArrondi1.Size = new Size(1093, 69);
+            panelArrondi1.Size = new Size(1666, 69);
             panelArrondi1.TabIndex = 0;
             // 
             // menuStrip2
@@ -101,7 +103,7 @@
             menuStrip2.Items.AddRange(new ToolStripItem[] { selectToolStripMenuItem, zoomToolStripMenuItem, shapeToolStripMenuItem });
             menuStrip2.Location = new Point(15, 5);
             menuStrip2.Name = "menuStrip2";
-            menuStrip2.Size = new Size(1063, 59);
+            menuStrip2.Size = new Size(1636, 59);
             menuStrip2.TabIndex = 1;
             menuStrip2.Text = "menuStrip2";
             // 
@@ -167,7 +169,7 @@
             TitleBar.Padding = new Padding(0, 0, 0, 5);
             TitleBar.RowCount = 1;
             TitleBar.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            TitleBar.Size = new Size(1099, 50);
+            TitleBar.Size = new Size(1672, 50);
             TitleBar.TabIndex = 0;
             TitleBar.MouseDown += panelTitre_MouseDown;
             // 
@@ -178,7 +180,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fichierToolStripMenuItem, editionToolStripMenuItem, affichageToolStripMenuItem, optionToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(949, 45);
+            menuStrip1.Size = new Size(1522, 45);
             menuStrip1.TabIndex = 3;
             menuStrip1.Text = "menuStrip1";
             menuStrip1.MouseDown += panelTitre_MouseDown;
@@ -193,20 +195,20 @@
             // nouveauToolStripMenuItem
             // 
             nouveauToolStripMenuItem.Name = "nouveauToolStripMenuItem";
-            nouveauToolStripMenuItem.Size = new Size(270, 34);
+            nouveauToolStripMenuItem.Size = new Size(213, 34);
             nouveauToolStripMenuItem.Text = "Nouveau";
             // 
             // ouvrirToolStripMenuItem
             // 
             ouvrirToolStripMenuItem.Name = "ouvrirToolStripMenuItem";
-            ouvrirToolStripMenuItem.Size = new Size(270, 34);
+            ouvrirToolStripMenuItem.Size = new Size(213, 34);
             ouvrirToolStripMenuItem.Text = "Ouvrir";
             ouvrirToolStripMenuItem.Click += ouvrirToolStripMenuItem_Click;
             // 
             // sauvegarderToolStripMenuItem
             // 
             sauvegarderToolStripMenuItem.Name = "sauvegarderToolStripMenuItem";
-            sauvegarderToolStripMenuItem.Size = new Size(270, 34);
+            sauvegarderToolStripMenuItem.Size = new Size(213, 34);
             sauvegarderToolStripMenuItem.Text = "Sauvegarder";
             sauvegarderToolStripMenuItem.Click += sauvegarderToolStripMenuItem_Click;
             // 
@@ -236,7 +238,7 @@
             ModifyWindowPanel.Controls.Add(button2);
             ModifyWindowPanel.Controls.Add(button3);
             ModifyWindowPanel.Dock = DockStyle.Fill;
-            ModifyWindowPanel.Location = new Point(949, 0);
+            ModifyWindowPanel.Location = new Point(1522, 0);
             ModifyWindowPanel.Margin = new Padding(0);
             ModifyWindowPanel.Name = "ModifyWindowPanel";
             ModifyWindowPanel.Size = new Size(150, 45);
@@ -284,7 +286,7 @@
             separation.Dock = DockStyle.Top;
             separation.Location = new Point(5, 130);
             separation.Name = "separation";
-            separation.Size = new Size(1099, 5);
+            separation.Size = new Size(1672, 5);
             separation.TabIndex = 1;
             // 
             // MainScreenSpliter
@@ -298,46 +300,90 @@
             // 
             // MainScreenSpliter.Panel1
             // 
-            MainScreenSpliter.Panel1.Controls.Add(flowLayoutPanel1);
+            MainScreenSpliter.Panel1.Controls.Add(controlCalqueButtonsLayout);
+            
             // 
             // MainScreenSpliter.Panel2
             // 
             MainScreenSpliter.Panel2.BackColor = Color.FromArgb(0, 122, 204);
-            MainScreenSpliter.Size = new Size(1099, 934);
+            MainScreenSpliter.Size = new Size(1672, 920);
             MainScreenSpliter.SplitterDistance = 297;
             MainScreenSpliter.SplitterWidth = 5;
             MainScreenSpliter.TabIndex = 0;
             MainScreenSpliter.TabStop = false;
+            
+            Panel panelMasque = new Panel();
+            panelMasque.Dock = DockStyle.Fill;
+            panelMasque.AutoScroll = false;
+            MainScreenSpliter.Panel1.Controls.Add(panelMasque);
+            panelMasque.Controls.Add(flowLayoutPanel1);
+            panelMasque.BringToFront();
+
             // 
             // flowLayoutPanel1
             // 
             flowLayoutPanel1.AutoScroll = true;
-            flowLayoutPanel1.Controls.Add(controleCalque1);
-            flowLayoutPanel1.Dock = DockStyle.Fill;
-            flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanel1.Dock = DockStyle.None;
+            flowLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             flowLayoutPanel1.Location = new Point(0, 0);
+            flowLayoutPanel1.Size = new Size(panelMasque.Width + 30, panelMasque.Height);
+            flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(297, 934);
             flowLayoutPanel1.TabIndex = 0;
             flowLayoutPanel1.WrapContents = false;
             // 
-            // controleCalque1
+            // controlCalqueButtonsLayout
             // 
-            controleCalque1.BackColor = Color.White;
-            controleCalque1.BorderStyle = BorderStyle.FixedSingle;
-            controleCalque1.Location = new Point(3, 3);
-            controleCalque1.MaximumSize = new Size(290, 215);
-            controleCalque1.MinimumSize = new Size(290, 215);
-            controleCalque1.Name = "controleCalque1";
-            controleCalque1.Padding = new Padding(5);
-            controleCalque1.Size = new Size(290, 215);
-            controleCalque1.TabIndex = 0;
+            controlCalqueButtonsLayout.FlowDirection = FlowDirection.RightToLeft;
+            controlCalqueButtonsLayout.BackColor = Color.Red;
+            controlCalqueButtonsLayout.Controls.Add(button5);
+            controlCalqueButtonsLayout.Controls.Add(button4);
+            controlCalqueButtonsLayout.Dock = DockStyle.Top;
+            controlCalqueButtonsLayout.Location = new Point(0, 0);
+            controlCalqueButtonsLayout.Name = "controlCalqueButtonsLayout";
+            controlCalqueButtonsLayout.Size = new Size(297, 55);
+            controlCalqueButtonsLayout.TabIndex = 0;
+            // 
+            // button4
+            // 
+            button4.Size = new Size(50, 50);
+            button4.FlatStyle = FlatStyle.Flat;
+            button4.FlatAppearance.BorderSize = 0; // Crucial pour le centrage !
+            button4.Text = "+";
+            button4.Font = new Font(button4.Font.FontFamily, 15f, FontStyle.Bold);
+            button4.TextAlign = ContentAlignment.MiddleCenter;
+            button4.UseCompatibleTextRendering = true;
+            button4.Click += Button4_Click;
+
+            // Nouveau Path spécifique pour le bouton 4
+            using (var path4 = new System.Drawing.Drawing2D.GraphicsPath())
+            {
+                path4.AddEllipse(0, 0, button4.Width, button4.Height);
+                button4.Region = new Region(path4);
+            }
+
+            // --- Configuration du Bouton 5 (Corbeille) ---
+            button5.Size = new Size(50, 50);
+            button5.FlatStyle = FlatStyle.Flat;
+            button5.FlatAppearance.BorderSize = 0;
+            button5.Text = "🗑"; // Utilise un icone ou "C" car "corbeille" est trop long pour 50px
+            button5.TextAlign = ContentAlignment.MiddleCenter;
+            button5.Click += Button5_Click;
+
+            // Nouveau Path spécifique pour le bouton 5
+            using (var path5 = new System.Drawing.Drawing2D.GraphicsPath())
+            {
+                path5.AddEllipse(0, 0, button5.Width, button5.Height);
+                button5.Region = new Region(path5);
+            }
+            button4.Padding = new Padding(0, 0, 0, 3);
+            button5.Padding = new Padding(4, 1, 0, 0);
             // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1109, 1074);
+            ClientSize = new Size(1682, 1060);
             Controls.Add(MainScreenSpliter);
             Controls.Add(separation);
             Controls.Add(MainTopBar);
@@ -359,7 +405,7 @@
             MainScreenSpliter.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)MainScreenSpliter).EndInit();
             MainScreenSpliter.ResumeLayout(false);
-            flowLayoutPanel1.ResumeLayout(false);
+            controlCalqueButtonsLayout.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -388,9 +434,11 @@
         private ToolStripMenuItem freehandShapeToolStripMenuItem;
         private PanelArrondi panelArrondi1;
         private FlowLayoutPanel flowLayoutPanel1;
-        private ControleCalque controleCalque1;
         private ToolStripMenuItem nouveauToolStripMenuItem;
         private ToolStripMenuItem ouvrirToolStripMenuItem;
         private ToolStripMenuItem sauvegarderToolStripMenuItem;
+        private FlowLayoutPanel controlCalqueButtonsLayout;
+        private Button button4;
+        private Button button5;
     }
 }
