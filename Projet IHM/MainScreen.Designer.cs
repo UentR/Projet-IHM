@@ -53,10 +53,12 @@
             button3 = new Button();
             separation = new Panel();
             MainScreenSpliter = new SplitContainer();
-            flowLayoutPanel1 = new FlowLayoutPanel();
             controlCalqueButtonsLayout = new FlowLayoutPanel();
-            button4 = new Button();
             button5 = new Button();
+            button4 = new Button();
+            panelMasque = new Panel();
+            flowLayoutPanel1 = new FlowLayoutPanel();
+            colorToolStripMenuItem = new ToolStripMenuItem();
             MainTopBar.SuspendLayout();
             panelArrondi1.SuspendLayout();
             menuStrip2.SuspendLayout();
@@ -67,6 +69,7 @@
             MainScreenSpliter.Panel1.SuspendLayout();
             MainScreenSpliter.SuspendLayout();
             controlCalqueButtonsLayout.SuspendLayout();
+            panelMasque.SuspendLayout();
             SuspendLayout();
             // 
             // MainTopBar
@@ -100,7 +103,7 @@
             // 
             menuStrip2.Dock = DockStyle.Fill;
             menuStrip2.ImageScalingSize = new Size(24, 24);
-            menuStrip2.Items.AddRange(new ToolStripItem[] { selectToolStripMenuItem, zoomToolStripMenuItem, shapeToolStripMenuItem });
+            menuStrip2.Items.AddRange(new ToolStripItem[] { selectToolStripMenuItem, zoomToolStripMenuItem, shapeToolStripMenuItem, colorToolStripMenuItem });
             menuStrip2.Location = new Point(15, 5);
             menuStrip2.Name = "menuStrip2";
             menuStrip2.Size = new Size(1636, 59);
@@ -300,8 +303,8 @@
             // 
             // MainScreenSpliter.Panel1
             // 
+            MainScreenSpliter.Panel1.Controls.Add(panelMasque);
             MainScreenSpliter.Panel1.Controls.Add(controlCalqueButtonsLayout);
-            
             // 
             // MainScreenSpliter.Panel2
             // 
@@ -311,73 +314,76 @@
             MainScreenSpliter.SplitterWidth = 5;
             MainScreenSpliter.TabIndex = 0;
             MainScreenSpliter.TabStop = false;
-            
-            Panel panelMasque = new Panel();
-            panelMasque.Dock = DockStyle.Fill;
-            panelMasque.AutoScroll = false;
-            MainScreenSpliter.Panel1.Controls.Add(panelMasque);
-            panelMasque.Controls.Add(flowLayoutPanel1);
-            panelMasque.BringToFront();
-
-            // 
-            // flowLayoutPanel1
-            // 
-            flowLayoutPanel1.AutoScroll = true;
-            flowLayoutPanel1.Dock = DockStyle.None;
-            flowLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            flowLayoutPanel1.Location = new Point(0, 0);
-            flowLayoutPanel1.Size = new Size(panelMasque.Width + 30, panelMasque.Height);
-            flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
-            flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.TabIndex = 0;
-            flowLayoutPanel1.WrapContents = false;
             // 
             // controlCalqueButtonsLayout
             // 
-            controlCalqueButtonsLayout.FlowDirection = FlowDirection.RightToLeft;
             controlCalqueButtonsLayout.BackColor = Color.Red;
             controlCalqueButtonsLayout.Controls.Add(button5);
             controlCalqueButtonsLayout.Controls.Add(button4);
             controlCalqueButtonsLayout.Dock = DockStyle.Top;
+            controlCalqueButtonsLayout.FlowDirection = FlowDirection.RightToLeft;
             controlCalqueButtonsLayout.Location = new Point(0, 0);
             controlCalqueButtonsLayout.Name = "controlCalqueButtonsLayout";
             controlCalqueButtonsLayout.Size = new Size(297, 55);
             controlCalqueButtonsLayout.TabIndex = 0;
             // 
+            // button5
+            // 
+            button5.FlatAppearance.BorderSize = 0;
+            button5.FlatStyle = FlatStyle.Flat;
+            button5.Location = new Point(244, 3);
+            button5.Name = "button5";
+            button5.Padding = new Padding(4, 1, 0, 0);
+            button5.Size = new Size(50, 50);
+            button5.TabIndex = 0;
+            button5.Text = "🗑";
+            button5.TabStop = false;
+            button5.Click += Button5_Click;
+            // 
             // button4
             // 
-            button4.Size = new Size(50, 50);
+            button4.FlatAppearance.BorderSize = 0;
             button4.FlatStyle = FlatStyle.Flat;
-            button4.FlatAppearance.BorderSize = 0; // Crucial pour le centrage !
+            button4.Font = new Font("Segoe UI", 15F, FontStyle.Bold);
+            button4.Location = new Point(188, 3);
+            button4.Name = "button4";
+            button4.Padding = new Padding(0, 0, 0, 3);
+            button4.Size = new Size(50, 50);
+            button4.TabIndex = 1;
             button4.Text = "+";
-            button4.Font = new Font(button4.Font.FontFamily, 15f, FontStyle.Bold);
-            button4.TextAlign = ContentAlignment.MiddleCenter;
             button4.UseCompatibleTextRendering = true;
             button4.Click += Button4_Click;
-
-            // Nouveau Path spécifique pour le bouton 4
-            using (var path4 = new System.Drawing.Drawing2D.GraphicsPath())
-            {
-                path4.AddEllipse(0, 0, button4.Width, button4.Height);
-                button4.Region = new Region(path4);
-            }
-
-            // --- Configuration du Bouton 5 (Corbeille) ---
-            button5.Size = new Size(50, 50);
-            button5.FlatStyle = FlatStyle.Flat;
-            button5.FlatAppearance.BorderSize = 0;
-            button5.Text = "🗑"; // Utilise un icone ou "C" car "corbeille" est trop long pour 50px
-            button5.TextAlign = ContentAlignment.MiddleCenter;
-            button5.Click += Button5_Click;
-
-            // Nouveau Path spécifique pour le bouton 5
-            using (var path5 = new System.Drawing.Drawing2D.GraphicsPath())
-            {
-                path5.AddEllipse(0, 0, button5.Width, button5.Height);
-                button5.Region = new Region(path5);
-            }
+            button4.TabStop = false;
             button4.Padding = new Padding(0, 0, 0, 3);
             button5.Padding = new Padding(4, 1, 0, 0);
+            // 
+            // panelMasque
+            // 
+            panelMasque.Controls.Add(flowLayoutPanel1);
+            panelMasque.Dock = DockStyle.Fill;
+            panelMasque.AutoScroll = true;
+            panelMasque.Location = new Point(0, 0);
+            panelMasque.Name = "panelMasque";
+            panelMasque.TabIndex = 1;
+            panelMasque.BringToFront();
+            // 
+            // flowLayoutPanel1
+            // 
+            flowLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            flowLayoutPanel1.AutoScroll = true;
+            flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
+            flowLayoutPanel1.Location = new Point(0, 0);
+            flowLayoutPanel1.Name = "flowLayoutPanel1";
+            flowLayoutPanel1.Size = new Size(350, MainScreenSpliter.Panel1.Height);
+            flowLayoutPanel1.TabIndex = 0;
+            flowLayoutPanel1.WrapContents = false;
+            // 
+            // colorToolStripMenuItem
+            // 
+            colorToolStripMenuItem.Name = "colorToolStripMenuItem";
+            colorToolStripMenuItem.Size = new Size(71, 55);
+            colorToolStripMenuItem.Text = "Color";
+            colorToolStripMenuItem.Click += colorToolStripMenuItem_Click;
             // 
             // MainScreen
             // 
@@ -406,6 +412,7 @@
             ((System.ComponentModel.ISupportInitialize)MainScreenSpliter).EndInit();
             MainScreenSpliter.ResumeLayout(false);
             controlCalqueButtonsLayout.ResumeLayout(false);
+            panelMasque.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -440,5 +447,7 @@
         private FlowLayoutPanel controlCalqueButtonsLayout;
         private Button button4;
         private Button button5;
+        private ToolStripMenuItem colorToolStripMenuItem;
+        private Panel panelMasque;
     }
 }

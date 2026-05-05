@@ -12,12 +12,10 @@ namespace Projet_IHM.Movable.Shape
         protected List<PointF> relativePoints;
         protected PointF lastPoint = PointF.Empty;
 
-        public FreeHand(PointF pos, List<PointF> points) : base(pos) { relativePoints = points; }
-        public FreeHand(PointF pos, List<PointF> points, bool isFull) : base(pos, isFull) { relativePoints = points; }
-        public FreeHand(PointF pos) : base(pos) { relativePoints = new List<PointF> { PointF.Empty }; }
-        public FreeHand(PointF pos, bool isFull) : base(pos, isFull) { relativePoints = new List<PointF> { PointF.Empty }; }
-
-        public override double Area() => throw new NotImplementedException();
+        public FreeHand(PointF pos, List<PointF> points, Color c) : base(pos, c) { relativePoints = points; }
+        public FreeHand(PointF pos, List<PointF> points, bool isFull, Color c) : base(pos, isFull, c) { relativePoints = points; }
+        public FreeHand(PointF pos, Color c) : base(pos, c) { relativePoints = new List<PointF> { PointF.Empty }; }
+        public FreeHand(PointF pos, bool isFull, Color c) : base(pos, isFull, c) { relativePoints = new List<PointF> { PointF.Empty }; }
 
         public void Add(PointF p)
         {

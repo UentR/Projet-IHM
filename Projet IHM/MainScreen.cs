@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Xml;
@@ -25,6 +26,20 @@ namespace Projet_IHM
         public MainScreen()
         {
             InitializeComponent();
+
+            // Arrondi pour le bouton 4 (+)
+            using (var path4 = new System.Drawing.Drawing2D.GraphicsPath())
+            {
+                path4.AddEllipse(0, 0, button4.Width, button4.Height);
+                button4.Region = new Region(path4);
+            }
+
+            // Arrondi pour le bouton 5 (Corbeille)
+            using (var path5 = new System.Drawing.Drawing2D.GraphicsPath())
+            {
+                path5.AddEllipse(0, 0, button5.Width, button5.Height);
+                button5.Region = new Region(path5);
+            }
 
             // 1. Initialisation de ton modèle et de ta zone de dessin
             this.md = new Modele();
@@ -79,8 +94,12 @@ namespace Projet_IHM
             this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
 
             this.md.CreateNewCalque();
-            this.zD = new ZoneDessin(this.md, new SizeF(this.MainScreenSpliter.Panel2.Width - 20, this.MainScreenSpliter.Panel2.Height - 20));
+            this.zD = new ZoneDessin(this.md, new Size(this.MainScreenSpliter.Panel2.Width - 20, this.MainScreenSpliter.Panel2.Height - 20));
             this.MainScreenSpliter.Panel2.Controls.Add(this.zD);
+
+            this.KeyPreview = true;
+            zD.Focus();
+            this.ActiveControl = this.zD;
         }
 
 
@@ -123,6 +142,8 @@ namespace Projet_IHM
             switch (((ToolStripMenuItem)sender).Name)
             {
                 case "selectToolStripMenuItem":
+                    md.removeSelected();
+                    zD.Invalidate();
                     this.zD.setTool(Tool.Select);
                     break;
                 case "ellipseToolStripMenuItem":
@@ -141,9 +162,32 @@ namespace Projet_IHM
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            //if (this.zD != null)
-            //this.zD.Resize(this.MainScreenSpliter.Panel2.Width, this.MainScreenSpliter.Panel2.Height);
+            if (this.zD != null)
+            {
+                Point p = Point.Empty;
+                Size current = this.zD.GetSize();
+                Size visee = new Size(this.MainScreenSpliter.Panel2.Width - 20, this.MainScreenSpliter.Panel2.Height - 20);
+                float widthRatio = (float)visee.Width / current.Width;
+                float heightRatio = (float)visee.Height / current.Height;
+                float ratio;
+                if (widthRatio < heightRatio)
+                {
+                    ratio = widthRatio;
+                    visee.Height = visee.Width * 2/3;
+                }
+                else
+                {
+                    ratio = heightRatio;
+                    visee.Width = visee.Height * 3 / 2;
+                }
+                p.X = (MainScreenSpliter.Panel2.Width - visee.Width)/2;
+                p.Y = (MainScreenSpliter.Panel2.Height - visee.Height)/2;
+
+                this.zD.ResizeZoom(p, visee, ratio);
+            }
         }
+
+
 
         private void sauvegarderToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -219,12 +263,73 @@ namespace Projet_IHM
         private void Button4_Click(object sender, EventArgs e)
         {
             this.md.CreateNewCalque();
+            zD.Focus();
         }
 
         private void Button5_Click(object sender, EventArgs e)
         {
             this.md.deleteCalque();
+            zD.Focus();
         }
+
+        private void colorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (ColorDialog colorDialog = new ColorDialog())
+            {
+                // Permet à l'utilisateur de créer ses propres couleurs
+                colorDialog.AllowFullOpen = true;
+
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    Color selectedColor = colorDialog.Color;
+                    this.md.setColor(selectedColor);
+                }
+            }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            switch (e.KeyCode)
+            {
+                case Keys.ControlKey:
+                    zD.setState("ctrl", true);
+                    break;
+                case Keys.ShiftKey:
+                    zD.setState("shift", true);
+                    break;
+                case Keys.Enter:
+                    //zD.handleKey(e);
+                    //// On bloque le comportement par défaut de la touche Entrée
+                    //e.Handled = true;
+                    //e.SuppressKeyPress = true;
+                    //break;
+                case Keys.Escape:
+                case Keys.D0:
+                case Keys.D1:
+                case Keys.D2:
+                case Keys.D3:
+                case Keys.D4:
+                    zD.handleKey(e);
+                    break;
+            }
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            base.OnKeyUp(e);
+            switch (e.KeyCode)
+            {
+                case Keys.ControlKey:
+                    zD.setState("ctrl", false);
+                    break;
+                case Keys.ShiftKey:
+                    zD.setState("shift", false);
+                    break;
+            }
+        }
+
     }
 
     // Une classe pour redéfinir les couleurs par défaut

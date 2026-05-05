@@ -11,12 +11,10 @@ namespace Projet_IHM.Movable.Shape.Simple
     class Rect : Simple
     {
 
-        public Rect(PointF position, SizeF s) : base(position, s) { }
-        public Rect(PointF position) : base(position, SizeF.Empty) { }
+        public Rect(PointF position, SizeF s, Color c) : base(position, s, c) { }
+        public Rect(PointF position, Color c) : base(position, SizeF.Empty, c) { }
 
-        public Rect(PointF position, SizeF s, bool isFull) : base(position, s, isFull) { }
-
-        public override double Area() => this.size.Height * this.size.Width;
+        public Rect(PointF position, SizeF s, bool isFull, Color c) : base(position, s, isFull, c) { }
 
         public override bool isInside(PointF p)
         {
@@ -33,9 +31,9 @@ namespace Projet_IHM.Movable.Shape.Simple
     [DataContract]
     class Square : Rect
     {
-        public Square(PointF position, float side) : base(position, new SizeF(side, side)) { }
-        public Square(PointF position) : base(position) { }
-        public Square(PointF position, float side, bool isFull) : base(position, new SizeF(side, side), isFull) { }
+        public Square(PointF position, float side, Color c) : base(position, new SizeF(side, side), c) { }
+        public Square(PointF position, Color c) : base(position, c) { }
+        public Square(PointF position, float side, bool isFull, Color c) : base(position, new SizeF(side, side), isFull, c) { }
 
         public override void resize(SizeF size)
         {

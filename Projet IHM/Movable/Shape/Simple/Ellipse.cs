@@ -10,14 +10,10 @@ namespace Projet_IHM.Movable.Shape.Simple
     [KnownType(typeof(Circle))]
     class Ellipse : Simple
     {
-        public Ellipse(PointF position, SizeF s) : base(position, s) { }
-        public Ellipse(PointF position) : base(position, SizeF.Empty) { }
-        public Ellipse(PointF position, SizeF s, bool isFull) : base(position, s, isFull) { }
+        public Ellipse(PointF position, SizeF s, Color c) : base(position, s, c) { }
+        public Ellipse(PointF position, Color c) : base(position, SizeF.Empty, c) { }
+        public Ellipse(PointF position, SizeF s, bool isFull, Color c) : base(position, s, isFull, c) { }
 
-        public override double Area()
-        {
-            return Math.PI * (this.size.Width / 2.0) * (this.size.Height / 2.0);
-        }
         public override bool isInside(PointF p)
         {
             double centerX = position.X + this.size.Width / 2.0;
@@ -37,10 +33,10 @@ namespace Projet_IHM.Movable.Shape.Simple
     class Circle : Ellipse
     {
 
-        public Circle(PointF position) : base(position) { }
+        public Circle(PointF position, Color c) : base(position, c) { }
 
-        public Circle(PointF position, float radius) : base(position, new SizeF(radius * 2, radius * 2)) { }
-        public Circle(PointF position, float radius, bool isFull) : base(position, new SizeF(radius * 2, radius * 2), isFull) { }
+        public Circle(PointF position, float radius, Color c) : base(position, new SizeF(radius * 2, radius * 2), c) { }
+        public Circle(PointF position, float radius, bool isFull, Color c) : base(position, new SizeF(radius * 2, radius * 2), isFull, c) { }
 
         public override void resize(SizeF size)
         {

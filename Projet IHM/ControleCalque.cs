@@ -74,7 +74,8 @@ namespace Projet_IHM
                 FlatStyle = FlatStyle.Flat,
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(55, 55, 55),
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                TabStop = false
             };
             btnHaut.Click += (s, e) => { updateCalque?.Invoke(id, UpdateCalqueOption.Up); };
 
@@ -87,7 +88,8 @@ namespace Projet_IHM
                 FlatStyle = FlatStyle.Flat,
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(55, 55, 55),
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                TabStop=false
             };
             btnBas.Click += (s, e) => { updateCalque?.Invoke(id, UpdateCalqueOption.Down); };
 

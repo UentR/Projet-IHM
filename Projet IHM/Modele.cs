@@ -23,8 +23,11 @@ namespace Projet_IHM
         public Action<bool, ControleCalque> UpdateCalque = null!;
         public Action<int, int> SwapCalque = null!;
 
-        private FreeHand currentFHDraw = null;
-        private Simple currentSDraw = null;
+        private FreeHand currentFHDraw = null!;
+        private Simple currentSDraw = null!;
+        private Rect zoomBorder = new Rect(PointF.Empty, SizeF.Empty, false, Color.DimGray);
+
+        private Color currentColor = Color.Red;
 
         private Dictionary<int, ControleCalque> calquesControler = new Dictionary<int, ControleCalque>();
         private Dictionary<int, List<Movable.Movable>> calques = new Dictionary<int, List<Movable.Movable>>();
@@ -37,6 +40,8 @@ namespace Projet_IHM
         private int nbCalque = 0;
         private List<Movable.Movable> formes => calques[currentCalque];
         private HashSet<Movable.Movable> selectedFormes = new HashSet<Movable.Movable>();
+
+        public bool isCalqueVisible(int idx) => isVisible[idx];
 
         public void CreateNewCalque()
         {
@@ -55,10 +60,13 @@ namespace Projet_IHM
 
         public void deleteCalque()
         {
-            if (calquesControler.ContainsKey(currentCalque))
+            if (isLocked[currentCalque]) return;
+            if (!isLocked[currentCalque] && calquesControler.ContainsKey(currentCalque))
             {
                 UpdateCalque?.Invoke(false, calquesControler[currentCalque]);
                 calquesControler.Remove(currentCalque);
+                calquesOrder.Remove(currentCalque);
+                OnModelChanged?.Invoke();
             }
         }
 
@@ -80,7 +88,7 @@ namespace Projet_IHM
                     case UpdateCalqueOption.Visibility:
                         isVisible[id] = !isVisible[id]; OnModelChanged?.Invoke();  break;
                     case UpdateCalqueOption.Lock:
-                        isLocked[id] = !isLocked[id]; break;
+                        isLocked[id] = !isLocked[id]; removeSelected(); break;
                     case UpdateCalqueOption.Down:
                         pos = calquesOrder.IndexOf(id);
                         if (pos > 0)
@@ -89,6 +97,7 @@ namespace Projet_IHM
                             int temp = calquesOrder[pos - 1];
                             calquesOrder[pos - 1] = calquesOrder[pos];
                             calquesOrder[pos] = temp;
+                            OnModelChanged?.Invoke();
                         }
                         break;
                     case UpdateCalqueOption.Up:
@@ -99,6 +108,7 @@ namespace Projet_IHM
                             int temp = calquesOrder[pos + 1];
                             calquesOrder[pos + 1] = calquesOrder[pos];
                             calquesOrder[pos] = temp;
+                            OnModelChanged?.Invoke();
                         }
                         break;
                     case UpdateCalqueOption.Choose:
@@ -113,8 +123,12 @@ namespace Projet_IHM
 
         public FreeHand getFH() => currentFHDraw;
         public Simple getSimpleDraw() => currentSDraw;
+        public Rect getZoomBorder() => zoomBorder;
+
+        public void setColor(Color c) { currentColor = c; }
 
         public Dictionary<int, List<Movable.Movable>> getCalques() => calques;
+        public List<Movable.Movable> getCalques(int idx) => calques[idx];
         public List<int> getCalquesOrder() => calquesOrder;
         
 
@@ -159,7 +173,8 @@ namespace Projet_IHM
 
         public void addFH()
         {
-            if (currentFHDraw != null)
+            if (isLocked[currentCalque]) return;
+            if (!isLocked[currentCalque] && currentFHDraw != null)
             {
                 currentFHDraw.ClearLastPointF();
                 formes.Add(currentFHDraw);
@@ -170,7 +185,8 @@ namespace Projet_IHM
 
         public void addSimple()
         {
-            if (currentSDraw != null)
+            if (isLocked[currentCalque]) return;
+            if (!isLocked[currentCalque] && currentSDraw != null)
             {
                 formes.Add(currentSDraw);
                 currentSDraw = null;
@@ -180,15 +196,32 @@ namespace Projet_IHM
 
         public void addMouseFH(PointF p)
         {
-            if (currentFHDraw != null)
+            if (isLocked[currentCalque]) return;
+            if (!isLocked[currentCalque] && currentFHDraw != null)
             {
                 currentFHDraw.SetLastPointF(p);
                 OnModelChanged?.Invoke();
             }
         }
 
+        public void setPosZoom(PointF p)
+        {
+            zoomBorder.updatePosition(p);
+            OnModelChanged?.Invoke();
+        }
 
+        public void setSizeZoom(PointF p)
+        {
+            zoomBorder.setEndBoundingBox(p);
+            OnModelChanged?.Invoke();
+        }
 
+        public void clearZoom() 
+        { 
+            zoomBorder.updatePosition(PointF.Empty);
+            zoomBorder.setEndBoundingBox(PointF.Empty);
+            OnModelChanged?.Invoke();
+        }
 
         public Movable.Movable GetForme(int index) => formes[index]; 
 
@@ -227,6 +260,7 @@ namespace Projet_IHM
 
         public bool collide(PointF p)
         {
+            if (isLocked[currentCalque]) return false;
             for (int i = FormesCount(currentCalque) - 1; i >= 0; i--)
             {
                 if (formes[i].isInside(p))
@@ -255,6 +289,7 @@ namespace Projet_IHM
 
         public void addFHPointF(PointF p)
         {
+            if (isLocked[currentCalque]) return;
             if (currentFHDraw != null)
             {
                 currentFHDraw.Add(p);
@@ -262,28 +297,29 @@ namespace Projet_IHM
             }
             else
             {
-                currentFHDraw = new FreeHand(p);
+                currentFHDraw = new FreeHand(p, currentColor);
                 OnModelChanged?.Invoke();
             }
         }
 
         public void setPosNewShape(PointF p, Types t)
         {
+            if (isLocked[currentCalque]) return;
             if (currentSDraw == null)
             {
                 switch (t)
                 {
                     case (Types.Rect):
-                        currentSDraw = new Rect(p);
+                        currentSDraw = new Rect(p, currentColor);
                         break;
                     case (Types.Square):
-                        currentSDraw = new Square(p);
+                        currentSDraw = new Square(p, currentColor);
                         break;
                     case (Types.Ellipse):
-                        currentSDraw = new Ellipse(p);
+                        currentSDraw = new Ellipse(p, currentColor);
                         break;
                     case (Types.Circle):
-                        currentSDraw = new Circle(p);
+                        currentSDraw = new Circle(p, currentColor);
                         break;
                 }
             }
@@ -291,6 +327,7 @@ namespace Projet_IHM
 
         public void setSizeSimple(PointF p)
         {
+            if (isLocked[currentCalque]) return;
             if (currentSDraw != null) 
             { 
                 SizeF s = p.Subtract(currentSDraw.getPosition());

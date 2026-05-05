@@ -11,18 +11,25 @@ namespace Projet_IHM.Movable.Shape
     {
         [DataMember]
         public bool isFull { get; set; }
-        public Shape(PointF pos) : base(pos)
-        { 
+        [DataMember]
+        protected Color color = Color.Red;
+
+        public Color GetColor() => this.color;
+
+        public Shape(PointF pos, Color c) : base(pos)
+        {
             this.isFull = true;
+            color = c;
         }
 
-        public Shape(PointF pos, bool isFull) : base(pos)
+        public Shape(PointF pos, bool isFull, Color c) : base(pos)
         {
             this.isFull = isFull;
+            color = c;
         }
 
-        public abstract double Area();
         public PointF getPosition() => this.position;
+        
 
         
 
