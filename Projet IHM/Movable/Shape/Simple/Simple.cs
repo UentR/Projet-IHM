@@ -8,7 +8,7 @@ namespace Projet_IHM.Movable.Shape.Simple
     [DataContract]
     [KnownType(typeof(Rect))]
     [KnownType(typeof(Ellipse))]
-    //[KnownType(typeof(Line))]
+    [KnownType(typeof(Line))]
     abstract class Simple : Shape
     {
         #region 1. Attributs

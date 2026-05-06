@@ -137,11 +137,20 @@ namespace Projet_IHM
                 case Keys.Back:
                     md.deleteSelected();
                     break;
-                case Keys.Down:
+                case Keys.K:
                     md.MoveDownShape();
                     break;
-                case Keys.Up:
+                case Keys.I:
                     md.MoveUpShape();
+                    break;
+                case Keys.S:
+                    selectToolStripMenuItem.PerformClick();
+                    break;
+                case Keys.Z:
+                    zoomToolStripMenuItem.PerformClick();
+                    break;
+                case Keys.C:
+                    colorToolStripMenuItem.PerformClick();
                     break;
                 default:
                     zD.handleKey(e); break;
@@ -273,7 +282,7 @@ namespace Projet_IHM
                     break;
                 case "labelToolStripMenuItem":
                     zD.setTool(Tool.Label);
-                    zD.setCursor(Cursors.Hand);
+                    zD.setCursor(Cursors.IBeam);
                     break;
             }
         }

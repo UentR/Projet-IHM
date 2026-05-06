@@ -124,8 +124,7 @@
             selectToolStripMenuItem.Size = new Size(74, 55);
             selectToolStripMenuItem.Text = "Select";
             selectToolStripMenuItem.Click += ToolStripMenuItem_Click;
-            selectToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.S;
-            selectToolStripMenuItem.ToolTipText = "Select (Alt+S)";
+            selectToolStripMenuItem.ToolTipText = "Select (S)";
             selectToolStripMenuItem.AutoToolTip = true;
             // 
             // zoomToolStripMenuItem
@@ -133,9 +132,8 @@
             zoomToolStripMenuItem.Name = "zoomToolStripMenuItem";
             zoomToolStripMenuItem.Size = new Size(76, 55);
             zoomToolStripMenuItem.Text = "Zoom";
-            zoomToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.Z;
             zoomToolStripMenuItem.Click += ToolStripMenuItem_Click;
-            zoomToolStripMenuItem.ToolTipText = "Zoom (Alt+Z)";
+            zoomToolStripMenuItem.ToolTipText = "Zoom (Z)";
             zoomToolStripMenuItem.AutoToolTip = true;
             // 
             // labelToolStripMenuItem
@@ -143,9 +141,10 @@
             labelToolStripMenuItem.Name = "labelToolStripMenuItem";
             labelToolStripMenuItem.Size = new Size(76, 55);
             labelToolStripMenuItem.Text = "Label";
-            labelToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D6;
-            labelToolStripMenuItem.ToolTipText = "Label (Alt+6)";
+            labelToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D6;
+            labelToolStripMenuItem.ToolTipText = "Label (Ctrl+6)";
             labelToolStripMenuItem.AutoToolTip = true;
+            labelToolStripMenuItem.Click += ToolStripMenuItem_Click;
             // 
             // shapeToolStripMenuItem
             // 
@@ -167,7 +166,7 @@
             lineToolStripMenuItem.Size = new Size(190, 34);
             lineToolStripMenuItem.Text = "Line";
             lineToolStripMenuItem.Click += ToolStripMenuItem_Click;
-            lineToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D1;
+            lineToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D1;
             // 
             // rectangleToolStripMenuItem
             // 
@@ -175,7 +174,7 @@
             rectangleToolStripMenuItem.Size = new Size(190, 34);
             rectangleToolStripMenuItem.Text = "Rectangle";
             rectangleToolStripMenuItem.Click += ToolStripMenuItem_Click;
-            rectangleToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D2;
+            rectangleToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D2;
             // 
             // ellipseToolStripMenuItem
             // 
@@ -183,7 +182,7 @@
             ellipseToolStripMenuItem.Size = new Size(190, 34);
             ellipseToolStripMenuItem.Text = "Ellipse";
             ellipseToolStripMenuItem.Click += ToolStripMenuItem_Click;
-            ellipseToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D3;
+            ellipseToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D3;
             // 
             // starToolStripMenuItem
             // 
@@ -191,7 +190,7 @@
             starToolStripMenuItem.Size = new Size(190, 34);
             starToolStripMenuItem.Text = "Star";
             starToolStripMenuItem.Click += ToolStripMenuItem_Click;
-            starToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D4;
+            starToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D4;
             // 
             // freehandShapeToolStripMenuItem
             // 
@@ -199,7 +198,7 @@
             freehandShapeToolStripMenuItem.Size = new Size(241, 34);
             freehandShapeToolStripMenuItem.Text = "Freehand Shape";
             freehandShapeToolStripMenuItem.Click += ToolStripMenuItem_Click;
-            freehandShapeToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D5;
+            freehandShapeToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.D5;
             // 
             // TitleBar
             // 
@@ -460,8 +459,7 @@
             colorToolStripMenuItem.Size = new Size(71, 55);
             colorToolStripMenuItem.Text = "Color";
             colorToolStripMenuItem.Click += colorToolStripMenuItem_Click;
-            colorToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.C;
-            colorToolStripMenuItem.ToolTipText = "Color (Alt+c)";
+            colorToolStripMenuItem.ToolTipText = "Color (c)";
             colorToolStripMenuItem.AutoToolTip = true;
             // 
             // MainScreen
