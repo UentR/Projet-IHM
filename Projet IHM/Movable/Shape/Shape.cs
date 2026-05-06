@@ -9,13 +9,14 @@ namespace Projet_IHM.Movable.Shape
     [KnownType(typeof(Simple.Simple))]
     abstract class Shape : Movable
     {
+        #region 1. Attributs et Propriétés
         [DataMember]
         public bool isFull { get; set; }
         [DataMember]
         protected Color color = Color.Red;
+        #endregion
 
-        public Color GetColor() => this.color;
-
+        #region 2. Constructeurs
         public Shape(PointF pos, Color c) : base(pos)
         {
             this.isFull = true;
@@ -27,11 +28,12 @@ namespace Projet_IHM.Movable.Shape
             this.isFull = isFull;
             color = c;
         }
+        #endregion
 
+        #region 3. Accesseurs
+        public Color GetColor() => this.color;
+        public void SetColor(Color color) => this.color = color;
         public PointF getPosition() => this.position;
-        
-
-        
-
+        #endregion
     }
 }

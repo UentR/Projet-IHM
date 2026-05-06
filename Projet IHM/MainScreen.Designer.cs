@@ -30,16 +30,18 @@
         {
             MainTopBar = new TableLayoutPanel();
             panelArrondi1 = new PanelArrondi();
-            menuStrip2 = new MenuStrip();
+            menuStrip2 = new DarkMenuStrip2();
             selectToolStripMenuItem = new ToolStripMenuItem();
             zoomToolStripMenuItem = new ToolStripMenuItem();
             shapeToolStripMenuItem = new ToolStripMenuItem();
+            lineToolStripMenuItem = new ToolStripMenuItem();
             simpleShapesToolStripMenuItem = new ToolStripMenuItem();
             rectangleToolStripMenuItem = new ToolStripMenuItem();
             ellipseToolStripMenuItem = new ToolStripMenuItem();
+            starToolStripMenuItem = new ToolStripMenuItem();
             freehandShapeToolStripMenuItem = new ToolStripMenuItem();
             TitleBar = new TableLayoutPanel();
-            menuStrip1 = new MenuStrip();
+            menuStrip1 = new DarkMenuStrip1();
             fichierToolStripMenuItem = new ToolStripMenuItem();
             nouveauToolStripMenuItem = new ToolStripMenuItem();
             ouvrirToolStripMenuItem = new ToolStripMenuItem();
@@ -59,6 +61,7 @@
             panelMasque = new Panel();
             flowLayoutPanel1 = new FlowLayoutPanel();
             colorToolStripMenuItem = new ToolStripMenuItem();
+            labelToolStripMenuItem = new ToolStripMenuItem();
             MainTopBar.SuspendLayout();
             panelArrondi1.SuspendLayout();
             menuStrip2.SuspendLayout();
@@ -87,6 +90,8 @@
             MainTopBar.RowStyles.Add(new RowStyle(SizeType.Absolute, 75F));
             MainTopBar.Size = new Size(1672, 125);
             MainTopBar.TabIndex = 0;
+            MainTopBar.BackColor = ColorTranslator.FromHtml("#1E1E1E");
+            MainTopBar.ForeColor = Color.White;
             // 
             // panelArrondi1
             // 
@@ -98,17 +103,20 @@
             panelArrondi1.Padding = new Padding(15, 5, 15, 5);
             panelArrondi1.Size = new Size(1666, 69);
             panelArrondi1.TabIndex = 0;
+            panelArrondi1.BackColor = ColorTranslator.FromHtml("#1E1E1E");
+            panelArrondi1.ForeColor = Color.White;
             // 
             // menuStrip2
             // 
             menuStrip2.Dock = DockStyle.Fill;
             menuStrip2.ImageScalingSize = new Size(24, 24);
-            menuStrip2.Items.AddRange(new ToolStripItem[] { selectToolStripMenuItem, zoomToolStripMenuItem, shapeToolStripMenuItem, colorToolStripMenuItem });
+            menuStrip2.Items.AddRange(new ToolStripItem[] { selectToolStripMenuItem, zoomToolStripMenuItem, shapeToolStripMenuItem, colorToolStripMenuItem, labelToolStripMenuItem });
             menuStrip2.Location = new Point(15, 5);
             menuStrip2.Name = "menuStrip2";
             menuStrip2.Size = new Size(1636, 59);
             menuStrip2.TabIndex = 1;
             menuStrip2.Text = "menuStrip2";
+            menuStrip2.ShowItemToolTips = true;
             // 
             // selectToolStripMenuItem
             // 
@@ -116,26 +124,50 @@
             selectToolStripMenuItem.Size = new Size(74, 55);
             selectToolStripMenuItem.Text = "Select";
             selectToolStripMenuItem.Click += ToolStripMenuItem_Click;
+            selectToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.S;
+            selectToolStripMenuItem.ToolTipText = "Select (Alt+S)";
+            selectToolStripMenuItem.AutoToolTip = true;
             // 
             // zoomToolStripMenuItem
             // 
             zoomToolStripMenuItem.Name = "zoomToolStripMenuItem";
             zoomToolStripMenuItem.Size = new Size(76, 55);
             zoomToolStripMenuItem.Text = "Zoom";
+            zoomToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.Z;
+            zoomToolStripMenuItem.Click += ToolStripMenuItem_Click;
+            zoomToolStripMenuItem.ToolTipText = "Zoom (Alt+Z)";
+            zoomToolStripMenuItem.AutoToolTip = true;
+            // 
+            // labelToolStripMenuItem
+            // 
+            labelToolStripMenuItem.Name = "labelToolStripMenuItem";
+            labelToolStripMenuItem.Size = new Size(76, 55);
+            labelToolStripMenuItem.Text = "Label";
+            labelToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D6;
+            labelToolStripMenuItem.ToolTipText = "Label (Alt+6)";
+            labelToolStripMenuItem.AutoToolTip = true;
             // 
             // shapeToolStripMenuItem
             // 
-            shapeToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { simpleShapesToolStripMenuItem, freehandShapeToolStripMenuItem });
+            shapeToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { lineToolStripMenuItem, simpleShapesToolStripMenuItem, freehandShapeToolStripMenuItem });
             shapeToolStripMenuItem.Name = "shapeToolStripMenuItem";
             shapeToolStripMenuItem.Size = new Size(85, 55);
             shapeToolStripMenuItem.Text = "Shapes";
             // 
             // simpleShapesToolStripMenuItem
             // 
-            simpleShapesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { rectangleToolStripMenuItem, ellipseToolStripMenuItem });
+            simpleShapesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { rectangleToolStripMenuItem, ellipseToolStripMenuItem, starToolStripMenuItem });
             simpleShapesToolStripMenuItem.Name = "simpleShapesToolStripMenuItem";
             simpleShapesToolStripMenuItem.Size = new Size(241, 34);
             simpleShapesToolStripMenuItem.Text = "Simple Shapes";
+            // 
+            // lineToolStripMenuItem
+            // 
+            lineToolStripMenuItem.Name = "lineToolStripMenuItem";
+            lineToolStripMenuItem.Size = new Size(190, 34);
+            lineToolStripMenuItem.Text = "Line";
+            lineToolStripMenuItem.Click += ToolStripMenuItem_Click;
+            lineToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D1;
             // 
             // rectangleToolStripMenuItem
             // 
@@ -143,6 +175,7 @@
             rectangleToolStripMenuItem.Size = new Size(190, 34);
             rectangleToolStripMenuItem.Text = "Rectangle";
             rectangleToolStripMenuItem.Click += ToolStripMenuItem_Click;
+            rectangleToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D2;
             // 
             // ellipseToolStripMenuItem
             // 
@@ -150,6 +183,15 @@
             ellipseToolStripMenuItem.Size = new Size(190, 34);
             ellipseToolStripMenuItem.Text = "Ellipse";
             ellipseToolStripMenuItem.Click += ToolStripMenuItem_Click;
+            ellipseToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D3;
+            // 
+            // starToolStripMenuItem
+            // 
+            starToolStripMenuItem.Name = "starToolStripMenuItem";
+            starToolStripMenuItem.Size = new Size(190, 34);
+            starToolStripMenuItem.Text = "Star";
+            starToolStripMenuItem.Click += ToolStripMenuItem_Click;
+            starToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D4;
             // 
             // freehandShapeToolStripMenuItem
             // 
@@ -157,6 +199,7 @@
             freehandShapeToolStripMenuItem.Size = new Size(241, 34);
             freehandShapeToolStripMenuItem.Text = "Freehand Shape";
             freehandShapeToolStripMenuItem.Click += ToolStripMenuItem_Click;
+            freehandShapeToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.D5;
             // 
             // TitleBar
             // 
@@ -175,6 +218,8 @@
             TitleBar.Size = new Size(1672, 50);
             TitleBar.TabIndex = 0;
             TitleBar.MouseDown += panelTitre_MouseDown;
+            TitleBar.BackColor = ColorTranslator.FromHtml("#2D2D30");
+            TitleBar.ForeColor = Color.White;
             // 
             // menuStrip1
             // 
@@ -200,6 +245,8 @@
             nouveauToolStripMenuItem.Name = "nouveauToolStripMenuItem";
             nouveauToolStripMenuItem.Size = new Size(213, 34);
             nouveauToolStripMenuItem.Text = "Nouveau";
+            nouveauToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.N;
+            nouveauToolStripMenuItem.Click += nouveauToolStripMenuItem_Click;
             // 
             // ouvrirToolStripMenuItem
             // 
@@ -207,6 +254,7 @@
             ouvrirToolStripMenuItem.Size = new Size(213, 34);
             ouvrirToolStripMenuItem.Text = "Ouvrir";
             ouvrirToolStripMenuItem.Click += ouvrirToolStripMenuItem_Click;
+            ouvrirToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.O;
             // 
             // sauvegarderToolStripMenuItem
             // 
@@ -214,6 +262,7 @@
             sauvegarderToolStripMenuItem.Size = new Size(213, 34);
             sauvegarderToolStripMenuItem.Text = "Sauvegarder";
             sauvegarderToolStripMenuItem.Click += sauvegarderToolStripMenuItem_Click;
+            sauvegarderToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.S;
             // 
             // editionToolStripMenuItem
             // 
@@ -247,10 +296,13 @@
             ModifyWindowPanel.Size = new Size(150, 45);
             ModifyWindowPanel.TabIndex = 2;
             ModifyWindowPanel.WrapContents = false;
+            ModifyWindowPanel.ForeColor = Color.White;
+            ModifyWindowPanel.BackColor = ColorTranslator.FromHtml("#1E1E1E");
             // 
             // button1
             // 
-            button1.BackColor = Color.LightGray;
+            button1.BackColor = ColorTranslator.FromHtml("#2D2D30");
+            button1.ForeColor = Color.White;
             button1.Location = new Point(0, 0);
             button1.Margin = new Padding(0);
             button1.Name = "button1";
@@ -259,10 +311,14 @@
             button1.Text = "🗕";
             button1.UseVisualStyleBackColor = true;
             button1.Click += btnReduire_Click;
+            button1.FlatStyle = FlatStyle.Flat;
+            button1.FlatAppearance.BorderSize = 0;
+            button1.FlatAppearance.MouseOverBackColor = ColorTranslator.FromHtml("#007ACC");
             // 
             // button2
             // 
-            button2.BackColor = Color.LightGray;
+            button2.BackColor = ColorTranslator.FromHtml("#2D2D30");
+            button2.ForeColor = Color.White;
             button2.Location = new Point(50, 0);
             button2.Margin = new Padding(0);
             button2.Name = "button2";
@@ -271,10 +327,14 @@
             button2.Text = "🗖";
             button2.UseVisualStyleBackColor = true;
             button2.Click += btnAgrandir_Click;
+            button2.FlatStyle = FlatStyle.Flat;
+            button2.FlatAppearance.BorderSize = 0;
+            button2.FlatAppearance.MouseOverBackColor = ColorTranslator.FromHtml("#007ACC");
             // 
             // button3
             // 
-            button3.BackColor = Color.LightGray;
+            button3.BackColor = ColorTranslator.FromHtml("#2D2D30");
+            button3.ForeColor = Color.White;
             button3.Location = new Point(100, 0);
             button3.Margin = new Padding(0);
             button3.Name = "button3";
@@ -283,6 +343,9 @@
             button3.Text = "✖";
             button3.UseVisualStyleBackColor = true;
             button3.Click += btnFermer_Click;
+            button3.FlatStyle = FlatStyle.Flat;
+            button3.FlatAppearance.BorderSize = 0;
+            button3.FlatAppearance.MouseOverBackColor = ColorTranslator.FromHtml("#007ACC");
             // 
             // separation
             // 
@@ -291,6 +354,8 @@
             separation.Name = "separation";
             separation.Size = new Size(1672, 5);
             separation.TabIndex = 1;
+            separation.BackColor = ColorTranslator.FromHtml("#2D2D30");
+            separation.ForeColor = Color.White;
             // 
             // MainScreenSpliter
             // 
@@ -300,15 +365,20 @@
             MainScreenSpliter.Location = new Point(5, 135);
             MainScreenSpliter.Margin = new Padding(0);
             MainScreenSpliter.Name = "MainScreenSpliter";
+            MainScreenSpliter.BackColor = ColorTranslator.FromHtml("#2D2D30");
+            MainScreenSpliter.ForeColor = Color.White;
             // 
             // MainScreenSpliter.Panel1
             // 
+            MainScreenSpliter.Panel1.BackColor = ColorTranslator.FromHtml("#1E1E1E");
+            MainScreenSpliter.Panel1.ForeColor = Color.White;
             MainScreenSpliter.Panel1.Controls.Add(panelMasque);
             MainScreenSpliter.Panel1.Controls.Add(controlCalqueButtonsLayout);
             // 
             // MainScreenSpliter.Panel2
             // 
-            MainScreenSpliter.Panel2.BackColor = Color.FromArgb(0, 122, 204);
+            MainScreenSpliter.Panel2.BackColor = ColorTranslator.FromHtml("#1E1E1E");
+            MainScreenSpliter.Panel2.ForeColor = Color.White;
             MainScreenSpliter.Size = new Size(1672, 920);
             MainScreenSpliter.SplitterDistance = 297;
             MainScreenSpliter.SplitterWidth = 5;
@@ -317,7 +387,7 @@
             // 
             // controlCalqueButtonsLayout
             // 
-            controlCalqueButtonsLayout.BackColor = Color.Red;
+            controlCalqueButtonsLayout.BackColor = ColorTranslator.FromHtml("#1E1E1E");
             controlCalqueButtonsLayout.Controls.Add(button5);
             controlCalqueButtonsLayout.Controls.Add(button4);
             controlCalqueButtonsLayout.Dock = DockStyle.Top;
@@ -329,8 +399,6 @@
             // 
             // button5
             // 
-            button5.FlatAppearance.BorderSize = 0;
-            button5.FlatStyle = FlatStyle.Flat;
             button5.Location = new Point(244, 3);
             button5.Name = "button5";
             button5.Padding = new Padding(4, 1, 0, 0);
@@ -339,11 +407,15 @@
             button5.Text = "🗑";
             button5.TabStop = false;
             button5.Click += Button5_Click;
+            button5.BackColor = ColorTranslator.FromHtml("#2D2D30");
+            button5.ForeColor = Color.White;
+            button5.FlatStyle = FlatStyle.Flat;
+            button5.FlatAppearance.BorderSize = 0;
+            button5.FlatAppearance.MouseOverBackColor = ColorTranslator.FromHtml("#007ACC");
+            button5.Padding = new Padding(4, 1, 0, 0);
             // 
             // button4
             // 
-            button4.FlatAppearance.BorderSize = 0;
-            button4.FlatStyle = FlatStyle.Flat;
             button4.Font = new Font("Segoe UI", 15F, FontStyle.Bold);
             button4.Location = new Point(188, 3);
             button4.Name = "button4";
@@ -355,7 +427,11 @@
             button4.Click += Button4_Click;
             button4.TabStop = false;
             button4.Padding = new Padding(0, 0, 0, 3);
-            button5.Padding = new Padding(4, 1, 0, 0);
+            button4.BackColor = ColorTranslator.FromHtml("#2D2D30");
+            button4.ForeColor = Color.White;
+            button4.FlatStyle = FlatStyle.Flat;
+            button4.FlatAppearance.BorderSize = 0;
+            button4.FlatAppearance.MouseOverBackColor = ColorTranslator.FromHtml("#007ACC");
             // 
             // panelMasque
             // 
@@ -384,12 +460,18 @@
             colorToolStripMenuItem.Size = new Size(71, 55);
             colorToolStripMenuItem.Text = "Color";
             colorToolStripMenuItem.Click += colorToolStripMenuItem_Click;
+            colorToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.C;
+            colorToolStripMenuItem.ToolTipText = "Color (Alt+c)";
+            colorToolStripMenuItem.AutoToolTip = true;
             // 
             // MainScreen
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1682, 1060);
+            ResizeRedraw = true;
+            MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
+            KeyPreview = true;
             Controls.Add(MainScreenSpliter);
             Controls.Add(separation);
             Controls.Add(MainTopBar);
@@ -398,6 +480,8 @@
             Name = "MainScreen";
             Padding = new Padding(5);
             Text = "MainScreen";
+            BackColor = ColorTranslator.FromHtml("#2D2D30");
+            ForeColor = Color.White;
             MainTopBar.ResumeLayout(false);
             panelArrondi1.ResumeLayout(false);
             panelArrondi1.PerformLayout();
@@ -426,18 +510,19 @@
         private Button button2;
         private Button button3;
         private FlowLayoutPanel ModifyWindowPanel;
-        private MenuStrip menuStrip1;
+        private DarkMenuStrip1 menuStrip1;
         private ToolStripMenuItem fichierToolStripMenuItem;
         private ToolStripMenuItem editionToolStripMenuItem;
         private ToolStripMenuItem affichageToolStripMenuItem;
         private ToolStripMenuItem optionToolStripMenuItem;
-        private MenuStrip menuStrip2;
+        private DarkMenuStrip2 menuStrip2;
         private ToolStripMenuItem selectToolStripMenuItem;
         private ToolStripMenuItem zoomToolStripMenuItem;
         private ToolStripMenuItem shapeToolStripMenuItem;
         private ToolStripMenuItem simpleShapesToolStripMenuItem;
         private ToolStripMenuItem rectangleToolStripMenuItem;
         private ToolStripMenuItem ellipseToolStripMenuItem;
+        private ToolStripMenuItem starToolStripMenuItem;
         private ToolStripMenuItem freehandShapeToolStripMenuItem;
         private PanelArrondi panelArrondi1;
         private FlowLayoutPanel flowLayoutPanel1;
@@ -449,5 +534,7 @@
         private Button button5;
         private ToolStripMenuItem colorToolStripMenuItem;
         private Panel panelMasque;
+        private ToolStripMenuItem lineToolStripMenuItem;
+        private ToolStripMenuItem labelToolStripMenuItem;
     }
 }

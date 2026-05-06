@@ -17,7 +17,7 @@ namespace Projet_IHM
     }
 
 
-    public class ControleCalque : UserControl
+    public class ControleCalque : Panel
     {
 
         public Action<int, UpdateCalqueOption> updateCalque = null!;
@@ -36,8 +36,8 @@ namespace Projet_IHM
         private bool estVisible = true;
         private bool estVerrouille = false;
 
-        public ControleCalque(int id) 
-        { 
+        public ControleCalque(int id)
+        {
             this.id = id;
             InitialiserComposants();
             MettreAJourAffichage();
@@ -89,7 +89,7 @@ namespace Projet_IHM
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(55, 55, 55),
                 Cursor = Cursors.Hand,
-                TabStop=false
+                TabStop = false
             };
             btnBas.Click += (s, e) => { updateCalque?.Invoke(id, UpdateCalqueOption.Down); };
 
@@ -98,7 +98,7 @@ namespace Projet_IHM
             // 2. Le Label (En dessous de la zone du conteneur)
             lblTitre = new Label()
             {
-                Text = "Calque " + (id+1).ToString(),
+                Text = "Calque " + (id + 1).ToString(),
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
                 ForeColor = Color.White,
                 AutoSize = true,
@@ -137,7 +137,7 @@ namespace Projet_IHM
                 Location = new Point(190, 165),
                 Cursor = Cursors.Hand
             };
-            lblOeil.Click += (s, e) => { estVisible = !estVisible; MettreAJourAffichage(); updateCalque?.Invoke(id, UpdateCalqueOption.Visibility);  };
+            lblOeil.Click += (s, e) => { estVisible = !estVisible; MettreAJourAffichage(); updateCalque?.Invoke(id, UpdateCalqueOption.Visibility); };
 
             lblCadenas = new Label()
             {
@@ -233,7 +233,8 @@ namespace Projet_IHM
             if (state)
             {
                 this.BackColor = Color.FromArgb(150, 137, 123);
-            } else
+            }
+            else
             {
                 this.BackColor = Color.FromArgb(55, 55, 55);
             }

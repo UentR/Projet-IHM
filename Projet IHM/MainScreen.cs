@@ -10,7 +10,7 @@ namespace Projet_IHM
 {
     public partial class MainScreen : Form
     {
-
+        #region 1. Constantes et Imports
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
 
@@ -18,30 +18,32 @@ namespace Projet_IHM
         public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
+        #endregion
 
+
+        #region 2. Variables et Attributs
         Modele md;
         ZoneDessin zD = null;
+        #endregion
 
-
+        
+        #region 3. Constructeur
         public MainScreen()
         {
             InitializeComponent();
 
-            // Arrondi pour le bouton 4 (+)
+            // Arrondi des bouttons
             using (var path4 = new System.Drawing.Drawing2D.GraphicsPath())
             {
                 path4.AddEllipse(0, 0, button4.Width, button4.Height);
                 button4.Region = new Region(path4);
             }
-
-            // Arrondi pour le bouton 5 (Corbeille)
             using (var path5 = new System.Drawing.Drawing2D.GraphicsPath())
             {
                 path5.AddEllipse(0, 0, button5.Width, button5.Height);
                 button5.Region = new Region(path5);
             }
 
-            // 1. Initialisation de ton modèle et de ta zone de dessin
             this.md = new Modele();
             this.md.UpdateCalque += (state, obj) =>
             {
@@ -78,44 +80,141 @@ namespace Projet_IHM
 
                     flowLayoutPanel1.ResumeLayout();
                 }
-
             };
-
-            Theme.Appliquer(this);
-            TitleBar.BackColor = Theme.FondSecondaire;
-            this.BackColor = Theme.FondSecondaire;
-            menuStrip1.Renderer = new ToolStripProfessionalRenderer(new MenuCouleursPlates());
-            menuStrip2.Renderer = new ToolStripProfessionalRenderer(new MenuPiluleCouleurs());
-            menuStrip2.BackColor = Theme.FondSecondaire; // Doit être la même couleur que l'intérieur de la pilule
-            MainScreenSpliter.BackColor = Theme.FondSecondaire;
-            separation.BackColor = Theme.FondSecondaire;
-
-            this.ResizeRedraw = true;
-            this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
-
             this.md.CreateNewCalque();
+
             this.zD = new ZoneDessin(this.md, new Size(this.MainScreenSpliter.Panel2.Width - 20, this.MainScreenSpliter.Panel2.Height - 20));
             this.MainScreenSpliter.Panel2.Controls.Add(this.zD);
 
-            this.KeyPreview = true;
-            zD.Focus();
+            this.zD.Focus();
             this.ActiveControl = this.zD;
         }
+        #endregion
 
-
-        // Bouton Fermer
-        private void btnFermer_Click(object sender, EventArgs e)
+        
+        #region 4. Overrides (Fenêtre et Clavier)
+        protected override void OnResize(EventArgs e)
         {
-            this.Close(); // ou Application.Exit();
+            base.OnResize(e);
+            if (this.zD != null)
+            {
+                Point p = Point.Empty;
+                Size current = this.zD.GetSize();
+                Size visee = new Size(this.MainScreenSpliter.Panel2.Width - 20, this.MainScreenSpliter.Panel2.Height - 20);
+                float widthRatio = (float)visee.Width / current.Width;
+                float heightRatio = (float)visee.Height / current.Height;
+                float ratio;
+                if (widthRatio < heightRatio)
+                {
+                    ratio = widthRatio;
+                    visee.Height = visee.Width * 2 / 3;
+                }
+                else
+                {
+                    ratio = heightRatio;
+                    visee.Width = visee.Height * 3 / 2;
+                }
+                p.X = (MainScreenSpliter.Panel2.Width - visee.Width) / 2;
+                p.Y = (MainScreenSpliter.Panel2.Height - visee.Height) / 2;
+
+                this.zD.ResizeZoom(p, visee, ratio);
+            }
         }
 
-        // Bouton Réduire (Minimize)
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            switch (e.KeyCode)
+            {
+                case Keys.ControlKey:
+                    zD.setState("ctrl", true);
+                    break;
+                case Keys.ShiftKey:
+                    zD.setState("shift", true);
+                    break;
+                case Keys.Delete:
+                case Keys.Back:
+                    md.deleteSelected();
+                    break;
+                case Keys.Down:
+                    md.MoveDownShape();
+                    break;
+                case Keys.Up:
+                    md.MoveUpShape();
+                    break;
+                default:
+                    zD.handleKey(e); break;
+            }
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            base.OnKeyUp(e);
+            switch (e.KeyCode)
+            {
+                case Keys.ControlKey:
+                    zD.setState("ctrl", false);
+                    break;
+                case Keys.ShiftKey:
+                    zD.setState("shift", false);
+                    break;
+            }
+        }
+        #endregion
+
+        
+        #region 5. Logique de Sauvegarde et Chargement (Fichiers)
+        private void saveFile(string chemin)
+        {
+            var serializer = new DataContractSerializer(typeof(SaveDataWrapper));
+
+            var settings = new XmlWriterSettings { Indent = true };
+            var dataToSave = new SaveDataWrapper
+            {
+                Calques = this.md.getCalques(),
+                CalquesOrder = this.md.getCalquesOrder()
+            };
+
+            using (var writer = XmlWriter.Create(chemin, settings))
+            {
+                serializer.WriteObject(writer, dataToSave);
+            }
+        }
+
+        private void loadFile(string chemin)
+        {
+            try
+            {
+                var serializer = new DataContractSerializer(typeof(SaveDataWrapper));
+
+                using (var fs = new FileStream(chemin, FileMode.Open))
+                {
+                    var data = (SaveDataWrapper)serializer.ReadObject(fs);
+                    this.md.setCalques(data.Calques, data.CalquesOrder);
+                    this.Refresh();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur lors du chargement : {ex.Message}",
+                                "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        #endregion
+
+        
+        #region 6. Événements UI (Boutons, Menus, Fenêtre)
+        private void btnFermer_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
         private void btnReduire_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
         }
 
-        // Bouton Plein Écran (Maximize / Restore)
         private void btnAgrandir_Click(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Normal)
@@ -144,54 +243,43 @@ namespace Projet_IHM
                 case "selectToolStripMenuItem":
                     md.removeSelected();
                     zD.Invalidate();
-                    this.zD.setTool(Tool.Select);
+                    zD.setTool(Tool.Select);
+                    zD.setCursor(Cursors.SizeAll);
+                    break;
+                case "zoomToolStripMenuItem":
+                    md.removeSelected();
+                    zD.setTool(Tool.Zoom);
+                    zD.setCursor(Cursors.Cross);
                     break;
                 case "ellipseToolStripMenuItem":
-                    this.zD.setTool(Tool.Ellipse);
+                    zD.setTool(Tool.Ellipse);
+                    zD.setCursor(Cursors.Hand);
                     break;
                 case "rectangleToolStripMenuItem":
-                    this.zD.setTool(Tool.Rect);
+                    zD.setTool(Tool.Rect);
+                    zD.setCursor(Cursors.Hand);
                     break;
                 case "freehandShapeToolStripMenuItem":
-                    this.zD.setTool(Tool.FreeHand);
+                    zD.setTool(Tool.FreeHand);
+                    zD.setCursor(Cursors.Hand);
+                    break;
+                case "starToolStripMenuItem":
+                    zD.setTool(Tool.Star);
+                    zD.setCursor(Cursors.Hand);
+                    break;
+                case "lineToolStripMenuItem":
+                    zD.setTool(Tool.Line);
+                    zD.setCursor(Cursors.Hand);
+                    break;
+                case "labelToolStripMenuItem":
+                    zD.setTool(Tool.Label);
+                    zD.setCursor(Cursors.Hand);
                     break;
             }
         }
-
-
-        protected override void OnResize(EventArgs e)
-        {
-            base.OnResize(e);
-            if (this.zD != null)
-            {
-                Point p = Point.Empty;
-                Size current = this.zD.GetSize();
-                Size visee = new Size(this.MainScreenSpliter.Panel2.Width - 20, this.MainScreenSpliter.Panel2.Height - 20);
-                float widthRatio = (float)visee.Width / current.Width;
-                float heightRatio = (float)visee.Height / current.Height;
-                float ratio;
-                if (widthRatio < heightRatio)
-                {
-                    ratio = widthRatio;
-                    visee.Height = visee.Width * 2/3;
-                }
-                else
-                {
-                    ratio = heightRatio;
-                    visee.Width = visee.Height * 3 / 2;
-                }
-                p.X = (MainScreenSpliter.Panel2.Width - visee.Width)/2;
-                p.Y = (MainScreenSpliter.Panel2.Height - visee.Height)/2;
-
-                this.zD.ResizeZoom(p, visee, ratio);
-            }
-        }
-
-
 
         private void sauvegarderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Fichiers XML (*.xml)|*.xml";
 
@@ -199,25 +287,6 @@ namespace Projet_IHM
             {
                 string chemin = saveFileDialog.FileName;
                 saveFile(chemin);
-            }
-
-        }
-
-        private void saveFile(string chemin)
-        {
-            var serializer = new DataContractSerializer(typeof(SaveDataWrapper));
-
-            // Configuration pour avoir un XML "propre" (indenté)
-            var settings = new XmlWriterSettings { Indent = true };
-            var dataToSave = new SaveDataWrapper
-            {
-                Calques = this.md.getCalques(),
-                CalquesOrder = this.md.getCalquesOrder()
-            };
-
-            using (var writer = XmlWriter.Create(chemin, settings))
-            {
-                serializer.WriteObject(writer, dataToSave);
             }
         }
 
@@ -234,29 +303,22 @@ namespace Projet_IHM
             }
         }
 
-        private void loadFile(string chemin)
+        private void nouveauToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
-            {
-                var serializer = new DataContractSerializer(typeof(SaveDataWrapper));
+            md.NouveauProjet();
+        }
 
-                using (var fs = new FileStream(chemin, FileMode.Open))
+        private void colorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (ColorDialog colorDialog = new ColorDialog())
+            {
+                colorDialog.AllowFullOpen = true;
+
+                if (colorDialog.ShowDialog() == DialogResult.OK)
                 {
-                    // On récupère les données et on cast dans le bon type
-                    var data = (SaveDataWrapper)serializer.ReadObject(fs);
-
-                    // Mise à jour de votre modèle de données
-                    // Supposons que vous ayez une méthode setCalques ou similaire
-                    this.md.setCalques(data.Calques, data.CalquesOrder);
-
-                    // IMPORTANT : Pensez à forcer le rafraîchissement de l'affichage
-                    this.Refresh();
+                    Color selectedColor = colorDialog.Color;
+                    md.setColor(selectedColor);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erreur lors du chargement : {ex.Message}",
-                                "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -271,121 +333,10 @@ namespace Projet_IHM
             this.md.deleteCalque();
             zD.Focus();
         }
-
-        private void colorToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using (ColorDialog colorDialog = new ColorDialog())
-            {
-                // Permet à l'utilisateur de créer ses propres couleurs
-                colorDialog.AllowFullOpen = true;
-
-                if (colorDialog.ShowDialog() == DialogResult.OK)
-                {
-                    Color selectedColor = colorDialog.Color;
-                    this.md.setColor(selectedColor);
-                }
-            }
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-
-            switch (e.KeyCode)
-            {
-                case Keys.ControlKey:
-                    zD.setState("ctrl", true);
-                    break;
-                case Keys.ShiftKey:
-                    zD.setState("shift", true);
-                    break;
-                case Keys.Enter:
-                    //zD.handleKey(e);
-                    //// On bloque le comportement par défaut de la touche Entrée
-                    //e.Handled = true;
-                    //e.SuppressKeyPress = true;
-                    //break;
-                case Keys.Escape:
-                case Keys.D0:
-                case Keys.D1:
-                case Keys.D2:
-                case Keys.D3:
-                case Keys.D4:
-                    zD.handleKey(e);
-                    break;
-            }
-        }
-
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
-            base.OnKeyUp(e);
-            switch (e.KeyCode)
-            {
-                case Keys.ControlKey:
-                    zD.setState("ctrl", false);
-                    break;
-                case Keys.ShiftKey:
-                    zD.setState("shift", false);
-                    break;
-            }
-        }
-
+        #endregion
     }
 
-    // Une classe pour redéfinir les couleurs par défaut
-    public class MenuCouleursPlates : ProfessionalColorTable
-    {
-        public override Color MenuStripGradientBegin => Theme.FondPrincipal;
-        public override Color MenuStripGradientEnd => Theme.FondPrincipal;
-
-        public override Color MenuItemSelected => Theme.Accentuation; // Bleu au survol
-        public override Color MenuItemSelectedGradientBegin => Theme.Accentuation;
-        public override Color MenuItemSelectedGradientEnd => Theme.Accentuation;
-
-        public override Color MenuItemBorder => Color.Transparent;
-
-        public override Color ToolStripGradientBegin => Theme.FondSecondaire;
-        public override Color ToolStripGradientEnd => Theme.FondSecondaire;
-        public override Color ToolStripBorder => Color.Transparent;
-        public override Color MenuBorder => Color.Transparent;
-        public override Color ToolStripDropDownBackground => Theme.FondPrincipal;
-
-        // AJOUTE CECI : Supprime la bande blanche/grise à gauche (marge des icônes)
-        public override Color ImageMarginGradientBegin => Theme.FondPrincipal;
-        public override Color ImageMarginGradientMiddle => Theme.FondPrincipal;
-        public override Color ImageMarginGradientEnd => Theme.FondPrincipal;
-    }
-
-    public class MenuPiluleCouleurs : ProfessionalColorTable
-    {
-        private Color fondPilule = ColorTranslator.FromHtml("#2D2D30");
-        private Color survolPilule = ColorTranslator.FromHtml("#3E3E42"); // Un peu plus clair au survol
-
-        // On force le fond à utiliser cette couleur
-        public override Color MenuStripGradientBegin => fondPilule;
-        public override Color MenuStripGradientEnd => fondPilule;
-        public override Color ToolStripGradientBegin => fondPilule;
-        public override Color ToolStripGradientEnd => fondPilule;
-
-        // On garde les bordures transparentes
-        public override Color MenuBorder => Color.Transparent;
-        public override Color ToolStripBorder => Color.Transparent;
-
-        // Couleurs quand on passe la souris sur les boutons (Select, Zoom, Shapes)
-        public override Color MenuItemSelected => survolPilule;
-        public override Color MenuItemSelectedGradientBegin => survolPilule;
-        public override Color MenuItemSelectedGradientEnd => survolPilule;
-        public override Color MenuItemBorder => Color.Transparent;
-        public override Color MenuItemPressedGradientBegin => survolPilule;
-        public override Color MenuItemPressedGradientEnd => survolPilule;
-        public override Color ToolStripDropDownBackground => fondPilule;
-
-        // AJOUTE CECI : Supprime la bande blanche/grise à gauche (marge des icônes)
-        public override Color ImageMarginGradientBegin => fondPilule;
-        public override Color ImageMarginGradientMiddle => fondPilule;
-        public override Color ImageMarginGradientEnd => fondPilule;
-    }
-
+    #region Wrappers et Classes externes
     [DataContract(Name = "SaveData")]
     internal class SaveDataWrapper
     {
@@ -395,4 +346,5 @@ namespace Projet_IHM
         [DataMember(Name = "MyIntList")]
         required public List<int> CalquesOrder { get; set; }
     }
+    #endregion
 }
